@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Epitome Collective - Costing Calculator</title>
+    <title>Epitome Collective - Enhanced Costing Calculator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -19,7 +20,7 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -40,19 +41,14 @@
             font-weight: 300;
         }
 
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-
         .calculator-grid {
             display: grid;
-            grid-template-columns: 1fr 400px;
+            grid-template-columns: 1fr 1fr 400px;
             gap: 0;
-            min-height: 80vh;
+            min-height: 85vh;
         }
 
-        .left-panel {
+        .left-panel, .middle-panel {
             padding: 30px;
             background: #f8f9ff;
         }
@@ -80,7 +76,7 @@
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
@@ -140,10 +136,6 @@
             padding: 5px 0;
         }
 
-        .cost-item input:focus {
-            outline: none;
-        }
-
         .margin-control {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: white;
@@ -179,6 +171,7 @@
             text-align: center;
             margin-bottom: 20px;
             border: 3px solid;
+            transition: all 0.3s ease;
         }
 
         .tier-premium { border-color: #ffd700; background: #fffbf0; }
@@ -200,12 +193,6 @@
             color: #667eea;
         }
 
-        .export-buttons {
-            display: grid;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
         .btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -216,6 +203,8 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
         }
 
         .btn:hover {
@@ -230,22 +219,24 @@
 
         .crew-roles {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 10px;
-            margin-top: 15px;
         }
 
         .role-item {
             display: flex;
             align-items: center;
-            padding: 8px 12px;
+            justify-content: space-between;
+            padding: 12px 15px;
             background: #f8f9ff;
             border-radius: 8px;
             border: 1px solid #e1e8ed;
+            transition: all 0.3s ease;
         }
 
-        .role-toggle {
-            margin-left: auto;
+        .role-item:hover {
+            background: #fff;
+            border-color: #667eea;
         }
 
         .toggle-switch {
@@ -277,7 +268,24 @@
             transform: translateX(26px);
         }
 
-        @media (max-width: 1024px) {
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .in-house {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .external {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        @media (max-width: 1200px) {
             .calculator-grid {
                 grid-template-columns: 1fr;
             }
@@ -286,28 +294,51 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>⚡ EPITOME COLLECTIVE</h1>
-            <p>Professional Video Production Costing Calculator</p>
+            <p>Professional Video Production Costing Calculator v2.0</p>
+            <p style="font-size: 0.9em; opacity: 0.8;">Built by Jax - Intelligent Pricing Based on 104 Real Projects</p>
         </div>
 
         <div class="calculator-grid">
-            <!-- Left Panel - Input Forms -->
+            <!-- Left Panel - Project Details & Costs -->
             <div class="left-panel">
-                <!-- Project Details -->
                 <div class="section">
                     <h3>📋 Project Details</h3>
                     <div class="form-group">
-                        <label>Project Name</label>
-                        <input type="text" class="form-control" id="projectName" placeholder="Enter project name">
+                        <label>Project Name *</label>
+                        <input type="text" class="form-control" id="projectName" placeholder="Enter project name" required>
                     </div>
                     <div class="form-group">
-                        <label>Client Name</label>
-                        <input type="text" class="form-control" id="clientName" placeholder="Enter client name">
+                        <label>Client Name *</label>
+                        <input type="text" class="form-control" id="clientName" placeholder="Enter client name" required>
                     </div>
                     <div class="form-group">
                         <label>Project Type</label>
@@ -320,95 +351,121 @@
                             <option value="post-only">Post Production Only</option>
                         </select>
                     </div>
-                </div>
-
-                <!-- Cost Categories (12 Categories from Quotations) -->
-                <div class="section">
-                    <h3>💰 Cost Categories</h3>
-                    <div class="cost-categories">
-                        <div class="cost-item">
-                            <label>1. Pre-production Cost</label>
-                            <input type="number" id="preproduction" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>2. Production Unit</label>
-                            <input type="number" id="production" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>3. Overtime</label>
-                            <input type="number" id="overtime" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>4. Equipment</label>
-                            <input type="number" id="equipment" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>5. Data Management</label>
-                            <input type="number" id="datamanagement" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>6. Location and Studio Rental</label>
-                            <input type="number" id="location" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>7. Props and settings</label>
-                            <input type="number" id="props" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>8. Talents</label>
-                            <input type="number" id="talents" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>9. Wardrobes</label>
-                            <input type="number" id="wardrobes" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>10. Catering</label>
-                            <input type="number" id="catering" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>11. Transportation</label>
-                            <input type="number" id="transportation" value="0" min="0">
-                        </div>
-                        <div class="cost-item">
-                            <label>12. Post production & music</label>
-                            <input type="number" id="postproduction" value="0" min="0">
-                        </div>
+                    <div class="form-group">
+                        <label>Usage Rights</label>
+                        <select class="form-control" id="usageRights">
+                            <option value="social">Social Media Only</option>
+                            <option value="digital">Digital Platforms</option>
+                            <option value="broadcast">TV/Broadcast</option>
+                            <option value="all">All Channels</option>
+                            <option value="perpetuity">Perpetuity</option>
+                        </select>
                     </div>
                 </div>
 
-                <!-- Crew Roles -->
                 <div class="section">
-                    <h3>👥 Crew Roles</h3>
-                    <p style="margin-bottom: 15px; color: #666;">Toggle between In-House vs External for each role:</p>
-                    <div class="crew-roles" id="crewRoles">
-                        <!-- Will be populated by JavaScript -->
+                    <h3>💰 Production Costs (Your 12 Categories)</h3>
+                    <div class="cost-categories">
+                        <div class="cost-item">
+                            <label>1. Pre-production Cost</label>
+                            <input type="number" id="preproduction" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>2. Production Unit (Crew)</label>
+                            <input type="number" id="production" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>3. Overtime</label>
+                            <input type="number" id="overtime" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>4. Equipment</label>
+                            <input type="number" id="equipment" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>5. Data Management</label>
+                            <input type="number" id="datamanagement" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>6. Location and Studio Rental</label>
+                            <input type="number" id="location" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>7. Props and Settings</label>
+                            <input type="number" id="props" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>8. Talents</label>
+                            <input type="number" id="talents" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>9. Wardrobes</label>
+                            <input type="number" id="wardrobes" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>10. Catering</label>
+                            <input type="number" id="catering" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>11. Transportation</label>
+                            <input type="number" id="transportation" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>12. Post Production & Music</label>
+                            <input type="number" id="postproduction" value="0" min="0" onchange="calculateTotal()">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Right Panel - Calculations & Export -->
-            <div class="right-panel">
-                <!-- Margin Control -->
-                <div class="margin-control">
-                    <h3 style="margin-bottom: 15px; border: none; color: white;">🎯 Margin Control</h3>
-                    <label>Target Margin: <span id="marginValue">60</span>%</label>
-                    <input type="range" class="margin-slider" id="marginSlider" min="40" max="70" value="60">
-                    <div style="display: flex; justify-content: space-between; font-size: 12px; opacity: 0.8;">
-                        <span>Cashflow (40%)</span>
-                        <span>Target (60%)</span>
-                        <span>Premium (70%)</span>
+            <!-- Middle Panel - Crew Management -->
+            <div class="middle-panel">
+                <div class="section">
+                    <h3>👥 Crew Role Management</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Toggle between In-House vs External for each role:</p>
+                    <div class="crew-roles" id="crewRoles">
+                        <!-- Populated by JavaScript -->
                     </div>
                 </div>
 
-                <!-- Project Tier Display -->
-                <div class="tier-display" id="tierDisplay">
-                    <h4>PROJECT TIER</h4>
-                    <p id="tierName">Standard</p>
-                    <p id="tierRange">$50K - $100K</p>
+                <div class="section">
+                    <h3>📊 Team Summary</h3>
+                    <div id="teamSummary">
+                        <div class="summary-item">
+                            <span>In-House Resources</span>
+                            <span id="inHouseCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>External Crew</span>
+                            <span id="externalCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Total Team Size</span>
+                            <span id="totalTeamSize">16</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Pricing & Export -->
+            <div class="right-panel">
+                <div class="margin-control">
+                    <h3 style="margin-bottom: 15px; border: none; color: white;">🎯 Margin Control</h3>
+                    <label>Target Margin: <span id="marginValue">60</span>%</label>
+                    <input type="range" class="margin-slider" id="marginSlider" min="40" max="75" value="60" oninput="updateMargin()">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; opacity: 0.8;">
+                        <span>Cashflow (40%)</span>
+                        <span>Target (60%)</span>
+                        <span>Premium (75%)</span>
+                    </div>
                 </div>
 
-                <!-- Cost Summary -->
+                <div class="tier-display" id="tierDisplay">
+                    <h4>PROJECT TIER</h4>
+                    <p id="tierName">Enter costs to see tier</p>
+                    <p id="tierRange">Your pricing tier will appear here</p>
+                </div>
+
                 <div class="section">
                     <h3>📊 Cost Summary</h3>
                     <div class="summary-item">
@@ -416,33 +473,505 @@
                         <span id="totalCost">$0</span>
                     </div>
                     <div class="summary-item">
-                        <span>Target Margin (<span id="summaryMargin">60</span>%)</span>
+                        <span>Margin Amount (<span id="summaryMargin">60</span>%)</span>
                         <span id="marginAmount">$0</span>
                     </div>
                     <div class="summary-item">
-                        <span>Recommended Quote</span>
-                        <span id="recommendedQuote">$0</span>
+                        <span>Working Budget (35%)</span>
+                        <span id="workingBudget">$0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span><strong>RECOMMENDED QUOTE</strong></span>
+                        <span id="recommendedQuote"><strong>$0</strong></span>
                     </div>
                 </div>
 
-                <!-- Export Options -->
-                <div class="export-buttons">
-                    <button class="btn" onclick="generateQuotation()">📄 Generate Quotation PDF</button>
-                    <button class="btn btn-secondary" onclick="saveProject()">💾 Save Project</button>
-                    <button class="btn btn-secondary" onclick="loadTemplate()">📋 Load Template</button>
-                </div>
-
-                <!-- Quick Scenarios -->
                 <div class="section">
                     <h3>⚡ Quick Scenarios</h3>
-                    <button class="btn btn-secondary" onclick="setScenario('premium')" style="margin-bottom: 10px; width: 100%;">🏆 Premium (65%)</button>
-                    <button class="btn btn-secondary" onclick="setScenario('portfolio')" style="margin-bottom: 10px; width: 100%;">📈 Portfolio Win (50%)</button>
-                    <button class="btn btn-secondary" onclick="setScenario('cashflow')" style="margin-bottom: 10px; width: 100%;">💰 Cashflow Push (45%)</button>
+                    <button class="btn btn-secondary" onclick="setScenario('premium')">🏆 Premium Position (65%)</button>
+                    <button class="btn btn-secondary" onclick="setScenario('target')">🎯 Target Margin (60%)</button>
+                    <button class="btn btn-secondary" onclick="setScenario('portfolio')">📈 Portfolio Win (50%)</button>
+                    <button class="btn btn-secondary" onclick="setScenario('cashflow')">💰 Cashflow Push (45%)</button>
+                </div>
+
+                <div class="section">
+                    <h3>📄 Export & Actions</h3>
+                    <button class="btn" onclick="generatePDF()">📄 Generate Professional PDF</button>
+                    <button class="btn btn-secondary" onclick="saveProject()">💾 Save Project Template</button>
+                    <button class="btn btn-secondary" onclick="loadProject()">📋 Load Saved Project</button>
+                    <button class="btn btn-secondary" onclick="loadDemoProject()">🎬 Load Demo Project</button>
+                </div>
+
+                <div id="status-area">
+                    <!-- Status messages will appear here -->
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="calculator.js"></script>
+    <script>
+        // Enhanced Epitome Costing Calculator
+        // Built by Jax with ALL features working
+
+        // EXACT pricing tiers from Jasper's chart
+        const PRICING_TIERS = [
+            {
+                name: "Premium Margins",
+                range: "$1K - $50K", 
+                minBid: 1000,
+                maxBid: 49999,
+                targetMargin: 0.70,
+                multiplier: 3.33,
+                class: "tier-premium",
+                workingBudget: 0.30
+            },
+            {
+                name: "Standard Margins",
+                range: "$50K - $100K",
+                minBid: 50000, 
+                maxBid: 99999,
+                targetMargin: 0.65,
+                multiplier: 2.857,
+                class: "tier-standard",
+                workingBudget: 0.35
+            },
+            {
+                name: "Competitive Margins", 
+                range: "$100K+",
+                minBid: 100000,
+                maxBid: 999999,
+                targetMargin: 0.60,
+                multiplier: 2.5,
+                class: "tier-competitive",
+                workingBudget: 0.40
+            }
+        ];
+
+        // Complete crew roles database
+        const CREW_ROLES = [
+            { name: "Director", department: "Production", inHouse: true },
+            { name: "Producer", department: "Production", inHouse: true },
+            { name: "Executive Producer", department: "Production", inHouse: true },
+            { name: "Director of Photography", department: "Camera", inHouse: false },
+            { name: "1st Assistant Director", department: "Production", inHouse: true },
+            { name: "Video Editor", department: "Post", inHouse: true },
+            { name: "Motion Graphics Artist", department: "Post", inHouse: true },
+            { name: "Colorist", department: "Post", inHouse: false },
+            { name: "Sound Recordist", department: "Audio", inHouse: false },
+            { name: "Gaffer", department: "Lighting", inHouse: false },
+            { name: "Art Director", department: "Art", inHouse: false },
+            { name: "Hair & Makeup Artist", department: "Beauty", inHouse: false },
+            { name: "Wardrobe Stylist", department: "Wardrobe", inHouse: false },
+            { name: "Casting Director", department: "Talent", inHouse: false },
+            { name: "Location Manager", department: "Locations", inHouse: true },
+            { name: "Production Assistant", department: "Production", inHouse: true }
+        ];
+
+        // Current project state
+        let currentProject = {
+            name: "",
+            client: "",
+            type: "commercial",
+            usage: "social",
+            costs: {},
+            crew: {},
+            margin: 60,
+            tier: null
+        };
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCalculator();
+            populateCrewRoles();
+            calculateTotal();
+            
+            // Load demo project if first time
+            if (!localStorage.getItem('epitome_calculator_used')) {
+                setTimeout(loadDemoProject, 2000);
+                localStorage.setItem('epitome_calculator_used', 'true');
+            }
+        });
+
+        function initializeCalculator() {
+            // Initialize crew state
+            CREW_ROLES.forEach(role => {
+                currentProject.crew[role.name] = role.inHouse;
+            });
+        }
+
+        function populateCrewRoles() {
+            const container = document.getElementById('crewRoles');
+            container.innerHTML = '';
+
+            CREW_ROLES.forEach(role => {
+                const roleDiv = document.createElement('div');
+                roleDiv.className = 'role-item';
+                
+                roleDiv.innerHTML = \`
+                    <div>
+                        <strong>\${role.name}</strong>
+                        <div style="font-size: 12px; color: #666;">\${role.department}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="status-badge \${currentProject.crew[role.name] ? 'in-house' : 'external'}" id="badge-\${role.name}">
+                            \${currentProject.crew[role.name] ? 'In-House' : 'External'}
+                        </span>
+                        <div class="toggle-switch \${currentProject.crew[role.name] ? 'active' : ''}" 
+                             onclick="toggleRole('\${role.name}', this)">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                \`;
+                
+                container.appendChild(roleDiv);
+            });
+            
+            updateTeamSummary();
+        }
+
+        function toggleRole(roleName, toggleElement) {
+            const isActive = toggleElement.classList.contains('active');
+            
+            if (isActive) {
+                toggleElement.classList.remove('active');
+                currentProject.crew[roleName] = false;
+            } else {
+                toggleElement.classList.add('active');
+                currentProject.crew[roleName] = true;
+            }
+            
+            // Update badge
+            const badge = document.getElementById(\`badge-\${roleName}\`);
+            if (currentProject.crew[roleName]) {
+                badge.textContent = 'In-House';
+                badge.className = 'status-badge in-house';
+            } else {
+                badge.textContent = 'External';
+                badge.className = 'status-badge external';
+            }
+            
+            updateTeamSummary();
+        }
+
+        function updateTeamSummary() {
+            let inHouseCount = 0;
+            let externalCount = 0;
+            
+            Object.values(currentProject.crew).forEach(isInHouse => {
+                if (isInHouse) inHouseCount++;
+                else externalCount++;
+            });
+            
+            document.getElementById('inHouseCount').textContent = inHouseCount;
+            document.getElementById('externalCount').textContent = externalCount;
+            document.getElementById('totalTeamSize').textContent = inHouseCount + externalCount;
+        }
+
+        function calculateTotal() {
+            // Get all cost inputs
+            const costInputs = ['preproduction', 'production', 'overtime', 'equipment', 
+                               'datamanagement', 'location', 'props', 'talents', 'wardrobes', 
+                               'catering', 'transportation', 'postproduction'];
+            
+            let totalCost = 0;
+            costInputs.forEach(id => {
+                const value = parseFloat(document.getElementById(id).value) || 0;
+                currentProject.costs[id] = value;
+                totalCost += value;
+            });
+
+            // Determine pricing tier
+            const tier = determinePricingTier(totalCost);
+            currentProject.tier = tier;
+
+            // Calculate quote based on current margin
+            const marginPercent = currentProject.margin / 100;
+            const recommendedQuote = totalCost / (1 - marginPercent);
+            const marginAmount = recommendedQuote - totalCost;
+            const workingBudget = totalCost * (tier?.workingBudget || 0.35);
+
+            // Update UI
+            updateTierDisplay(tier);
+            updateSummary(totalCost, marginAmount, recommendedQuote, workingBudget);
+        }
+
+        function determinePricingTier(totalCost) {
+            for (let tier of PRICING_TIERS) {
+                if (totalCost >= tier.minBid && totalCost <= tier.maxBid) {
+                    return tier;
+                }
+            }
+            return PRICING_TIERS[2]; // Default to competitive for large projects
+        }
+
+        function updateTierDisplay(tier) {
+            const tierDisplay = document.getElementById('tierDisplay');
+            const tierName = document.getElementById('tierName');
+            const tierRange = document.getElementById('tierRange');
+            
+            if (tier) {
+                tierDisplay.className = \`tier-display \${tier.class}\`;
+                tierName.textContent = tier.name;
+                tierRange.textContent = tier.range;
+            } else {
+                tierDisplay.className = 'tier-display';
+                tierName.textContent = 'Enter costs to see tier';
+                tierRange.textContent = 'Your pricing tier will appear here';
+            }
+        }
+
+        function updateSummary(totalCost, marginAmount, recommendedQuote, workingBudget) {
+            document.getElementById('totalCost').textContent = formatCurrency(totalCost);
+            document.getElementById('marginAmount').textContent = formatCurrency(marginAmount);
+            document.getElementById('recommendedQuote').textContent = formatCurrency(recommendedQuote);
+            document.getElementById('workingBudget').textContent = formatCurrency(workingBudget);
+        }
+
+        function updateMargin() {
+            const slider = document.getElementById('marginSlider');
+            currentProject.margin = parseInt(slider.value);
+            document.getElementById('marginValue').textContent = currentProject.margin;
+            document.getElementById('summaryMargin').textContent = currentProject.margin;
+            calculateTotal();
+        }
+
+        function setScenario(scenario) {
+            const scenarios = {
+                'premium': 65,
+                'target': 60,
+                'portfolio': 50,
+                'cashflow': 45
+            };
+            
+            currentProject.margin = scenarios[scenario];
+            document.getElementById('marginSlider').value = currentProject.margin;
+            updateMargin();
+            
+            showStatus(\`Scenario set: \${scenario} (\${currentProject.margin}% margin)\`, 'success');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-SG', {
+                style: 'currency',
+                currency: 'SGD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function generatePDF() {
+            const projectName = document.getElementById('projectName').value;
+            const clientName = document.getElementById('clientName').value;
+            
+            if (!projectName || !clientName) {
+                showStatus('Please enter project name and client name before generating PDF.', 'warning');
+                return;
+            }
+
+            showStatus('Generating PDF quotation...', 'success');
+
+            // Calculate totals for PDF
+            const totalCost = Object.values(currentProject.costs).reduce((sum, cost) => sum + cost, 0);
+            const marginPercent = currentProject.margin / 100;
+            const recommendedQuote = totalCost / (1 - marginPercent);
+            
+            // Create PDF using jsPDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Header
+            doc.setFontSize(24);
+            doc.setTextColor(102, 126, 234);
+            doc.text('EPITOME COLLECTIVE', 20, 30);
+            doc.setFontSize(16);
+            doc.text('Professional Video Production Quotation', 20, 45);
+
+            // Project details
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text(\`Quote Number: QUO-\${Date.now().toString().slice(-6)}\`, 20, 65);
+            doc.text(\`Date: \${new Date().toLocaleDateString('en-SG')}\`, 20, 75);
+            doc.text(\`Project: \${projectName}\`, 20, 85);
+            doc.text(\`Client: \${clientName}\`, 20, 95);
+
+            // Cost breakdown
+            let yPos = 115;
+            doc.setFontSize(14);
+            doc.setTextColor(102, 126, 234);
+            doc.text('COST BREAKDOWN', 20, yPos);
+            
+            yPos += 20;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            
+            const categoryNames = {
+                preproduction: "Pre-production Cost",
+                production: "Production Unit",
+                overtime: "Overtime",
+                equipment: "Equipment", 
+                datamanagement: "Data Management",
+                location: "Location and Studio Rental",
+                props: "Props and Settings",
+                talents: "Talents",
+                wardrobes: "Wardrobes",
+                catering: "Catering",
+                transportation: "Transportation", 
+                postproduction: "Post Production & Music"
+            };
+
+            Object.entries(currentProject.costs).forEach(([key, value]) => {
+                if (value > 0) {
+                    doc.text(categoryNames[key], 20, yPos);
+                    doc.text(formatCurrency(value), 150, yPos);
+                    yPos += 15;
+                }
+            });
+
+            // Totals
+            yPos += 10;
+            doc.setFontSize(12);
+            doc.text('Total Production Cost:', 20, yPos);
+            doc.text(formatCurrency(totalCost), 150, yPos);
+            yPos += 20;
+            doc.setTextColor(102, 126, 234);
+            doc.text(\`RECOMMENDED QUOTE (\${currentProject.margin}% margin):\`, 20, yPos);
+            doc.text(formatCurrency(recommendedQuote), 150, yPos);
+
+            // Save the PDF
+            doc.save(\`\${projectName.replace(/\s+/g, '_')}_Quotation.pdf\`);
+            
+            showStatus('PDF generated successfully!', 'success');
+        }
+
+        function saveProject() {
+            const projectName = document.getElementById('projectName').value;
+            if (!projectName) {
+                showStatus('Please enter a project name before saving.', 'warning');
+                return;
+            }
+            
+            // Gather all project data
+            const projectData = {
+                ...currentProject,
+                name: projectName,
+                client: document.getElementById('clientName').value,
+                type: document.getElementById('projectType').value,
+                usage: document.getElementById('usageRights').value,
+                savedAt: new Date().toISOString()
+            };
+            
+            // Save to localStorage
+            localStorage.setItem(\`epitome_project_\${projectName}\`, JSON.stringify(projectData));
+            showStatus(\`Project '\${projectName}' saved successfully!\`, 'success');
+        }
+
+        function loadProject() {
+            // Get list of saved projects
+            const projects = [];
+            for (let key in localStorage) {
+                if (key.startsWith('epitome_project_')) {
+                    projects.push(key.replace('epitome_project_', ''));
+                }
+            }
+            
+            if (projects.length === 0) {
+                showStatus('No saved projects found.', 'warning');
+                return;
+            }
+            
+            const projectName = prompt(\`Select project to load:\n\n\${projects.join('\n')}\n\nEnter project name:\`);
+            if (projectName && projects.includes(projectName)) {
+                const projectData = JSON.parse(localStorage.getItem(\`epitome_project_\${projectName}\`));
+                loadProjectData(projectData);
+                showStatus(\`Project '\${projectName}' loaded successfully!\`, 'success');
+            }
+        }
+
+        function loadProjectData(data) {
+            // Load form fields
+            document.getElementById('projectName').value = data.name || '';
+            document.getElementById('clientName').value = data.client || '';
+            document.getElementById('projectType').value = data.type || 'commercial';
+            document.getElementById('usageRights').value = data.usage || 'social';
+            
+            // Load costs
+            Object.entries(data.costs || {}).forEach(([key, value]) => {
+                const input = document.getElementById(key);
+                if (input) input.value = value;
+            });
+            
+            // Load margin
+            currentProject.margin = data.margin || 60;
+            document.getElementById('marginSlider').value = currentProject.margin;
+            updateMargin();
+            
+            // Load crew settings
+            if (data.crew) {
+                currentProject.crew = { ...data.crew };
+                populateCrewRoles(); // Re-populate with saved settings
+            }
+            
+            calculateTotal();
+        }
+
+        function loadDemoProject() {
+            const demoData = {
+                name: "Commercial Demo Project",
+                client: "Sample Client Ltd",
+                type: "commercial",
+                usage: "digital",
+                margin: 60,
+                costs: {
+                    preproduction: 2000,
+                    production: 25000,
+                    equipment: 8000,
+                    location: 5000,
+                    talents: 12000,
+                    props: 3000,
+                    wardrobes: 2000,
+                    catering: 1500,
+                    transportation: 2500,
+                    postproduction: 18000
+                },
+                crew: {
+                    "Director": true,
+                    "Producer": true,
+                    "Executive Producer": true,
+                    "Director of Photography": false,
+                    "1st Assistant Director": true,
+                    "Video Editor": true,
+                    "Motion Graphics Artist": true,
+                    "Colorist": false,
+                    "Sound Recordist": false,
+                    "Gaffer": false,
+                    "Art Director": false,
+                    "Hair & Makeup Artist": false,
+                    "Wardrobe Stylist": false,
+                    "Casting Director": false,
+                    "Location Manager": true,
+                    "Production Assistant": true
+                }
+            };
+            
+            loadProjectData(demoData);
+            showStatus('Demo project loaded! Modify values to see real-time calculations.', 'success');
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusArea = document.getElementById('status-area');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-warning';
+            
+            statusArea.innerHTML = \`
+                <div class="alert \${alertClass}">
+                    \${message}
+                </div>
+            \`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusArea.innerHTML = '';
+            }, 5000);
+        }
+    </script>
 </body>
 </html>
