@@ -1,0 +1,93 @@
+{
+  "demo_projects": [
+    {
+      "name": "Social Media Campaign",
+      "client": "Demo Fashion Brand",
+      "type": "social",
+      "costs": {
+        "preproduction": 1000,
+        "production": 8000,
+        "equipment": 2000,
+        "talents": 3000,
+        "postproduction": 6000,
+        "transportation": 800,
+        "catering": 400
+      },
+      "margin": 65,
+      "tier": "Premium Margins",
+      "expectedQuote": "$61,142"
+    },
+    {
+      "name": "Corporate Commercial",
+      "client": "Tech Company Pte Ltd",
+      "type": "commercial", 
+      "costs": {
+        "preproduction": 2000,
+        "production": 25000,
+        "equipment": 8000,
+        "location": 5000,
+        "talents": 12000,
+        "props": 3000,
+        "wardrobes": 2000,
+        "catering": 1500,
+        "transportation": 2500,
+        "postproduction": 18000
+      },
+      "margin": 60,
+      "tier": "Standard Margins",
+      "expectedQuote": "$197,500"
+    },
+    {
+      "name": "Event Coverage",
+      "client": "Event Management Co",
+      "type": "event",
+      "costs": {
+        "production": 2500,
+        "equipment": 800,
+        "datamanagement": 200,
+        "transportation": 300,
+        "postproduction": 1000
+      },
+      "margin": 70,
+      "tier": "Premium Margins", 
+      "expectedQuote": "$16,000"
+    },
+    {
+      "name": "TVC Campaign",
+      "client": "Major Brand Agency",
+      "type": "tvc",
+      "costs": {
+        "preproduction": 8000,
+        "production": 120000,
+        "equipment": 25000,
+        "location": 15000,
+        "props": 12000,
+        "talents": 45000,
+        "wardrobes": 8000,
+        "catering": 5000,
+        "transportation": 8000,
+        "postproduction": 60000
+      },
+      "margin": 60,
+      "tier": "Competitive Margins",
+      "expectedQuote": "$815,000"
+    }
+  ],
+  
+  "usage_tips": [
+    "Start with a similar project type from demos",
+    "Adjust costs based on your specific requirements", 
+    "Use margin slider for different scenarios",
+    "Toggle crew roles based on availability",
+    "Save successful templates for reuse",
+    "Export PDF when ready to send to client"
+  ],
+  
+  "margin_guidelines": {
+    "premium": "65-70% - Small projects, high value adds",
+    "standard": "60-65% - Most commercial work", 
+    "competitive": "55-60% - Large projects, competitive bids",
+    "portfolio": "45-50% - Showcase work, strategic clients",
+    "cashflow": "40-45% - Quick wins, slow periods"
+  }
+}

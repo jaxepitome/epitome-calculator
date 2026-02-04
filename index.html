@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epitome Collective - Costing Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .calculator-grid {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 0;
+            min-height: 80vh;
+        }
+
+        .left-panel {
+            padding: 30px;
+            background: #f8f9ff;
+        }
+
+        .right-panel {
+            background: white;
+            padding: 30px;
+            border-left: 2px solid #eee;
+        }
+
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        .section h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .cost-categories {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .cost-item {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .cost-item:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .cost-item label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .cost-item input {
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            padding: 5px 0;
+        }
+
+        .cost-item input:focus {
+            outline: none;
+        }
+
+        .margin-control {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .margin-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.3);
+            outline: none;
+            -webkit-appearance: none;
+            margin: 15px 0;
+        }
+
+        .margin-slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .tier-display {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 3px solid;
+        }
+
+        .tier-premium { border-color: #ffd700; background: #fffbf0; }
+        .tier-standard { border-color: #4CAF50; background: #f0fff0; }
+        .tier-competitive { border-color: #2196F3; background: #f0f8ff; }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 16px;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            font-size: 18px;
+            color: #667eea;
+        }
+
+        .export-buttons {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+
+        .crew-roles {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .role-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+        }
+
+        .role-toggle {
+            margin-left: auto;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+
+        @media (max-width: 1024px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cost-categories {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ EPITOME COLLECTIVE</h1>
+            <p>Professional Video Production Costing Calculator</p>
+        </div>
+
+        <div class="calculator-grid">
+            <!-- Left Panel - Input Forms -->
+            <div class="left-panel">
+                <!-- Project Details -->
+                <div class="section">
+                    <h3>📋 Project Details</h3>
+                    <div class="form-group">
+                        <label>Project Name</label>
+                        <input type="text" class="form-control" id="projectName" placeholder="Enter project name">
+                    </div>
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" class="form-control" id="clientName" placeholder="Enter client name">
+                    </div>
+                    <div class="form-group">
+                        <label>Project Type</label>
+                        <select class="form-control" id="projectType">
+                            <option value="commercial">Commercial</option>
+                            <option value="social">Social Content</option>
+                            <option value="tvc">TVC Campaign</option>
+                            <option value="corporate">Corporate Video</option>
+                            <option value="event">Event Coverage</option>
+                            <option value="post-only">Post Production Only</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Cost Categories (12 Categories from Quotations) -->
+                <div class="section">
+                    <h3>💰 Cost Categories</h3>
+                    <div class="cost-categories">
+                        <div class="cost-item">
+                            <label>1. Pre-production Cost</label>
+                            <input type="number" id="preproduction" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>2. Production Unit</label>
+                            <input type="number" id="production" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>3. Overtime</label>
+                            <input type="number" id="overtime" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>4. Equipment</label>
+                            <input type="number" id="equipment" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>5. Data Management</label>
+                            <input type="number" id="datamanagement" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>6. Location and Studio Rental</label>
+                            <input type="number" id="location" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>7. Props and settings</label>
+                            <input type="number" id="props" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>8. Talents</label>
+                            <input type="number" id="talents" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>9. Wardrobes</label>
+                            <input type="number" id="wardrobes" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>10. Catering</label>
+                            <input type="number" id="catering" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>11. Transportation</label>
+                            <input type="number" id="transportation" value="0" min="0">
+                        </div>
+                        <div class="cost-item">
+                            <label>12. Post production & music</label>
+                            <input type="number" id="postproduction" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crew Roles -->
+                <div class="section">
+                    <h3>👥 Crew Roles</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Toggle between In-House vs External for each role:</p>
+                    <div class="crew-roles" id="crewRoles">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Calculations & Export -->
+            <div class="right-panel">
+                <!-- Margin Control -->
+                <div class="margin-control">
+                    <h3 style="margin-bottom: 15px; border: none; color: white;">🎯 Margin Control</h3>
+                    <label>Target Margin: <span id="marginValue">60</span>%</label>
+                    <input type="range" class="margin-slider" id="marginSlider" min="40" max="70" value="60">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; opacity: 0.8;">
+                        <span>Cashflow (40%)</span>
+                        <span>Target (60%)</span>
+                        <span>Premium (70%)</span>
+                    </div>
+                </div>
+
+                <!-- Project Tier Display -->
+                <div class="tier-display" id="tierDisplay">
+                    <h4>PROJECT TIER</h4>
+                    <p id="tierName">Standard</p>
+                    <p id="tierRange">$50K - $100K</p>
+                </div>
+
+                <!-- Cost Summary -->
+                <div class="section">
+                    <h3>📊 Cost Summary</h3>
+                    <div class="summary-item">
+                        <span>Total Production Cost</span>
+                        <span id="totalCost">$0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Target Margin (<span id="summaryMargin">60</span>%)</span>
+                        <span id="marginAmount">$0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Recommended Quote</span>
+                        <span id="recommendedQuote">$0</span>
+                    </div>
+                </div>
+
+                <!-- Export Options -->
+                <div class="export-buttons">
+                    <button class="btn" onclick="generateQuotation()">📄 Generate Quotation PDF</button>
+                    <button class="btn btn-secondary" onclick="saveProject()">💾 Save Project</button>
+                    <button class="btn btn-secondary" onclick="loadTemplate()">📋 Load Template</button>
+                </div>
+
+                <!-- Quick Scenarios -->
+                <div class="section">
+                    <h3>⚡ Quick Scenarios</h3>
+                    <button class="btn btn-secondary" onclick="setScenario('premium')" style="margin-bottom: 10px; width: 100%;">🏆 Premium (65%)</button>
+                    <button class="btn btn-secondary" onclick="setScenario('portfolio')" style="margin-bottom: 10px; width: 100%;">📈 Portfolio Win (50%)</button>
+                    <button class="btn btn-secondary" onclick="setScenario('cashflow')" style="margin-bottom: 10px; width: 100%;">💰 Cashflow Push (45%)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="calculator.js"></script>
+</body>
+</html>
