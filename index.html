@@ -507,7 +507,7 @@
                     <div id="marginIndicator" style="padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 10px;">
                         Margin: 60%
                     </div>
-                    <div id="tierDisplay">
+                    <div id="businessIntelligence">
                         <p>Enter project costs to see tier recommendations</p>
                     </div>
                 </div>
@@ -1034,9 +1034,9 @@
 
         function updateBusinessIntelligence(totalCost) {
             const tier = detectTier(totalCost);
-            const tierDisplay = document.getElementById('tierDisplay');
-            if (tierDisplay) {
-                tierDisplay.innerHTML = `
+            const businessIntelligence = document.getElementById('businessIntelligence');
+            if (businessIntelligence) {
+                businessIntelligence.innerHTML = `
                     <div class="tier-info">
                         <strong>Project Tier:</strong> ${tier.name}<br>
                         <strong>Suggested Payment:</strong> ${tier.payment}<br>
