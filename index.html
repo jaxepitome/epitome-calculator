@@ -714,7 +714,7 @@
             
             // Business Intelligence Updates
             updateMarginIndicator(currentProject.margin);
-            updateTierDisplay(totalCost);
+            updateBusinessIntelligence(totalCost);
         }
 
         function determinePricingTier(totalCost) {
@@ -1032,18 +1032,18 @@
             indicator.innerHTML = `Margin: ${marginPercentage.toFixed(1)}%`;
         }
 
-        function updateTierDisplay(totalCost) {
+        function updateBusinessIntelligence(totalCost) {
             const tier = detectTier(totalCost);
             const tierDisplay = document.getElementById('tierDisplay');
-            if (!tierDisplay) return;
-            
-            tierDisplay.innerHTML = `
-                <div class="tier-info">
-                    <strong>Project Tier:</strong> ${tier.name}<br>
-                    <strong>Suggested Payment:</strong> ${tier.payment}<br>
-                    ${tier.discount > 0 ? `<strong>Typical Discount:</strong> ${tier.discount}%` : '<strong>Pricing:</strong> Premium positioning'}
-                </div>
-            `;
+            if (tierDisplay) {
+                tierDisplay.innerHTML = `
+                    <div class="tier-info">
+                        <strong>Project Tier:</strong> ${tier.name}<br>
+                        <strong>Suggested Payment:</strong> ${tier.payment}<br>
+                        ${tier.discount > 0 ? `<strong>Typical Discount:</strong> ${tier.discount}%` : '<strong>Pricing:</strong> Premium positioning'}
+                    </div>
+                `;
+            }
         }
 
         // Real Project Templates
