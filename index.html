@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Epitome Collective - Business Costing Calculator V2</title>
+    <title>Epitome Collective - Enhanced Costing Calculator</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         * {
@@ -13,160 +13,66 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             padding: 20px;
         }
 
         .container {
             max-width: 1600px;
-            width: 100%;
             margin: 0 auto;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
         .header {
-            background: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
+            padding: 30px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
-        }
-
-        .mode-selector {
-            background: #667eea;
-            color: white;
-            padding: 15px;
-            text-align: center;
-        }
-
-        .mode-buttons {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            margin-top: 10px;
-        }
-
-        .mode-btn {
-            background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.3);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .mode-btn.active {
-            background: white;
-            color: #667eea;
-            border-color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
         }
 
         .calculator-grid {
             display: grid;
-            grid-template-columns: 1fr 2fr;
+            grid-template-columns: 1fr 1fr 400px;
             gap: 0;
+            min-height: 85vh;
         }
 
-        .left-panel, .right-panel {
-            padding: 20px;
+        .left-panel, .middle-panel {
+            padding: 30px;
+            background: #f8f9ff;
         }
 
         .right-panel {
-            background: #f8f9fa;
-            border-left: 1px solid #ddd;
+            background: white;
+            padding: 30px;
+            border-left: 2px solid #eee;
         }
 
         .section {
-            margin-bottom: 25px;
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
 
         .section h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
             border-bottom: 2px solid #667eea;
-            padding-bottom: 5px;
-        }
-
-        .department {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            overflow: hidden;
-        }
-
-        .department-header {
-            background: #667eea;
-            color: white;
-            padding: 10px 15px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .department-content {
-            padding: 0;
-        }
-
-        .crew-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-
-        .crew-table th,
-        .crew-table td {
-            border: 1px solid #ddd;
-            padding: 6px 8px;
-            text-align: center;
-        }
-
-        .crew-table th {
-            background: #f5f5f5;
-            font-weight: bold;
-            font-size: 11px;
-        }
-
-        .crew-table input {
-            width: 60px;
-            border: none;
-            padding: 2px;
-            text-align: center;
-        }
-
-        .crew-table .role-name {
-            text-align: left;
-            width: 200px;
-        }
-
-        .add-crew-btn {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            margin: 10px 15px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 15px;
+            padding-bottom: 10px;
         }
 
         .form-group {
@@ -175,203 +81,227 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
+            margin-bottom: 8px;
             color: #333;
+            font-weight: 600;
         }
 
         .form-control {
             width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .table-container {
-            overflow-x: auto;
+        .cost-categories {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .cost-item {
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .cost-item:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .cost-item label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .cost-item input {
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            padding: 5px 0;
+        }
+
+        .margin-control {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
             margin-bottom: 20px;
         }
 
-        .cost-table {
-            width: 100%;
-            min-width: 500px;
-            border-collapse: collapse;
-        }
-
-        .cost-table th,
-        .cost-table td {
-            border: 1px solid #ddd;
-            padding: 8px 12px;
-            text-align: left;
-        }
-
-        .cost-table th {
-            background: #f5f5f5;
-            font-weight: bold;
-        }
-
-        .cost-table input {
-            width: 100%;
-            border: none;
-            padding: 4px;
-            text-align: right;
-        }
-
-        .cost-table input:focus {
-            outline: 1px solid #667eea;
-        }
-
-        .total-row {
-            background: #667eea !important;
-            color: white;
-            font-weight: bold;
-        }
-
         .margin-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.3);
+            outline: none;
+            -webkit-appearance: none;
             margin: 15px 0;
         }
 
-        .slider-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-
-        .slider {
-            flex: 1;
-            height: 8px;
-            border-radius: 4px;
-            background: #ddd;
-            outline: none;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .slider:hover {
-            opacity: 1;
-        }
-
-        .slider::-webkit-slider-thumb {
+        .margin-slider::-webkit-slider-thumb {
             appearance: none;
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background: #667eea;
+            background: white;
             cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        .margin-presets {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .preset-btn {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
+        .tier-display {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
             text-align: center;
-            font-size: 12px;
-        }
-
-        .preset-btn.active {
-            background: #667eea;
-            color: white;
-        }
-
-        .margin-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-            margin-bottom: 15px;
-        }
-
-        .margin-table th,
-        .margin-table td {
-            border: 1px solid #ddd;
-            padding: 6px 8px;
-            text-align: center;
-        }
-
-        .margin-table th {
-            background: #f5f5f5;
-            font-weight: bold;
-        }
-
-        .summary-section {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 15px;
             margin-bottom: 20px;
+            border: 3px solid;
+            transition: all 0.3s ease;
         }
 
-        .summary-row {
+        .tier-premium { border-color: #ffd700; background: #fffbf0; }
+        .tier-standard { border-color: #4CAF50; background: #f0fff0; }
+        .tier-competitive { border-color: #2196F3; background: #f0f8ff; }
+
+        .summary-item {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
-            padding: 5px 0;
+            padding: 15px 0;
             border-bottom: 1px solid #eee;
+            font-size: 16px;
         }
 
-        .summary-row:last-child {
+        .summary-item:last-child {
             border-bottom: none;
-            font-weight: bold;
-            font-size: 16px;
+            font-weight: 600;
+            font-size: 18px;
             color: #667eea;
         }
 
         .btn {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
+            transition: all 0.3s ease;
             width: 100%;
             margin-bottom: 10px;
         }
 
         .btn:hover {
-            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
         }
 
         .btn-secondary {
-            background: #6c757d;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
         }
 
-        .btn-secondary:hover {
-            background: #545b62;
+        .crew-roles {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
         }
 
-        .hidden {
-            display: none;
+        .role-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: #f8f9ff;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+            transition: all 0.3s ease;
         }
 
-        .budget-input {
+        .role-item:hover {
+            background: #fff;
+            border-color: #667eea;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ddd;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #667eea;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .in-house {
             background: #e8f5e8;
-            border: 2px solid #4CAF50;
+            color: #2e7d32;
+        }
+
+        .external {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        @media (max-width: 1200px) {
+            .calculator-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cost-categories {
+                grid-template-columns: 1fr;
+            }
         }
 
         .alert {
-            padding: 12px;
-            border-radius: 4px;
-            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
         }
 
-        .alert-info {
+        .alert-success {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
@@ -383,1159 +313,834 @@
             border: 1px solid #ffeaa7;
         }
 
-        .department-toggle {
-            cursor: pointer;
-        }
-
-        .department-total {
-            background: #e9ecef;
-            font-weight: bold;
-        }
-
-        .remove-crew {
-            background: #dc3545;
-            color: white;
-            border: none;
-            padding: 2px 6px;
-            border-radius: 2px;
-            cursor: pointer;
-            font-size: 10px;
-        }
-
-        @media (max-width: 1200px) {
-            .calculator-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .margin-presets {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            .container {
-                border-radius: 0;
-            }
-            
-            .header {
-                padding: 15px;
-            }
-            
-            .header h1 {
-                font-size: 20px;
-            }
-            
-            .mode-selector {
-                padding: 10px;
-            }
-            
-            .mode-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .mode-btn {
-                padding: 15px 20px;
-                font-size: 16px;
-            }
-            
-            .left-panel, .right-panel {
-                padding: 15px;
-            }
-            
-            .cost-table, .crew-table {
-                font-size: 12px;
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>EPITOME COLLECTIVE</h1>
-            <p>Professional Business Costing Calculator V2</p>
-        </div>
-
-        <div class="mode-selector">
-            <p><strong>Select Your Costing Approach:</strong></p>
-            <div class="mode-buttons">
-                <button class="mode-btn active" onclick="setMode('cost-up')">
-                    📈 COST-UP: Calculate from scratch
-                </button>
-                <button class="mode-btn" onclick="setMode('budget-down')">
-                    🎯 BUDGET-DOWN: Work from client budget
-                </button>
-            </div>
+            <h1>⚡ EPITOME COLLECTIVE</h1>
+            <p>Professional Video Production Costing Calculator v2.0</p>
+            <p style="font-size: 0.9em; opacity: 0.8;">Built by Jax - Intelligent Pricing Based on 104 Real Projects</p>
         </div>
 
         <div class="calculator-grid">
-            <!-- LEFT PANEL -->
+            <!-- Left Panel - Project Details & Costs -->
             <div class="left-panel">
-                <!-- Project Details -->
                 <div class="section">
-                    <h3>Project Information</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Quote Number</label>
-                            <input type="text" class="form-control" id="quoteNumber" value="" readonly>
-                        </div>
-                        <div class="form-group">
-                            <label>Date</label>
-                            <input type="text" class="form-control" id="quoteDate" readonly>
-                        </div>
+                    <h3>📋 Project Details</h3>
+                    <div class="form-group">
+                        <label>Project Name *</label>
+                        <input type="text" class="form-control" id="projectName" placeholder="Enter project name" required>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Project Name *</label>
-                            <input type="text" class="form-control" id="projectName" placeholder="Enter project name">
-                        </div>
-                        <div class="form-group">
-                            <label>Client *</label>
-                            <input type="text" class="form-control" id="clientName" placeholder="Enter client name">
-                        </div>
+                    <div class="form-group">
+                        <label>Client Name *</label>
+                        <input type="text" class="form-control" id="clientName" placeholder="Enter client name" required>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Attention</label>
-                            <input type="text" class="form-control" id="clientContact" placeholder="Contact person">
-                        </div>
-                        <div class="form-group">
-                            <label>Contact</label>
-                            <input type="text" class="form-control" id="clientPhone" placeholder="Phone number">
-                        </div>
+                    <div class="form-group">
+                        <label>Project Type</label>
+                        <select class="form-control" id="projectType">
+                            <option value="commercial">Commercial</option>
+                            <option value="social">Social Content</option>
+                            <option value="tvc">TVC Campaign</option>
+                            <option value="corporate">Corporate Video</option>
+                            <option value="event">Event Coverage</option>
+                            <option value="post-only">Post Production Only</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Usage Rights</label>
-                        <input type="text" class="form-control" id="usageRights" placeholder="e.g. Digital, Social, Singapore - 12 months">
+                        <select class="form-control" id="usageRights">
+                            <option value="social">Social Media Only</option>
+                            <option value="digital">Digital Platforms</option>
+                            <option value="broadcast">TV/Broadcast</option>
+                            <option value="all">All Channels</option>
+                            <option value="perpetuity">Perpetuity</option>
+                        </select>
                     </div>
                 </div>
 
-                <!-- Budget Input (Budget-Down Mode) -->
-                <div class="section hidden" id="budget-section">
-                    <h3>Client Budget</h3>
-                    <div class="alert alert-info">
-                        <strong>Budget-Down Mode:</strong> Enter the client's budget and we'll calculate what you can afford for each category AND crew.
-                    </div>
-                    <div class="form-group">
-                        <label>Client Budget (SGD) *</label>
-                        <input type="number" class="form-control budget-input" id="clientBudget" placeholder="Enter client budget" onchange="calculateBudgetBreakdown()">
-                    </div>
-                </div>
-
-                <!-- Margin Strategy -->
                 <div class="section">
-                    <h3>Margin Strategy</h3>
-                    <div class="alert alert-info">
-                        <strong>Target Margin Reference:</strong> Based on historical project data.
-                    </div>
-                    <table class="margin-table">
-                        <thead>
-                            <tr>
-                                <th>Project Tier</th>
-                                <th>Budget Range</th>
-                                <th>Target Margin</th>
-                                <th>Multiplier</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="premium-tier">
-                                <td><strong>Premium</strong></td>
-                                <td>$1K - $50K</td>
-                                <td>70%</td>
-                                <td>3.33x</td>
-                            </tr>
-                            <tr class="standard-tier">
-                                <td><strong>Standard</strong></td>
-                                <td>$50K - $100K</td>
-                                <td>65%</td>
-                                <td>2.857x</td>
-                            </tr>
-                            <tr class="competitive-tier">
-                                <td><strong>Competitive</strong></td>
-                                <td>$100K+</td>
-                                <td>60%</td>
-                                <td>2.5x</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="margin-slider">
-                        <label><strong>Current Margin: <span id="marginDisplay">60</span>%</strong></label>
-                        <div class="slider-container">
-                            <span>40%</span>
-                            <input type="range" min="40" max="75" value="60" class="slider" id="marginSlider" onchange="updateMarginDisplay()">
-                            <span>75%</span>
+                    <h3>💰 Production Costs (Your 12 Categories)</h3>
+                    <div class="cost-categories">
+                        <div class="cost-item">
+                            <label>1. Pre-production Cost</label>
+                            <input type="number" id="preproduction" value="0" min="0" onchange="calculateTotal()">
                         </div>
-                        <div class="margin-presets">
-                            <button class="preset-btn" onclick="setMarginPreset(45, 'cashflow')">Cashflow (45%)</button>
-                            <button class="preset-btn" onclick="setMarginPreset(50, 'portfolio')">Portfolio (50%)</button>
-                            <button class="preset-btn active" onclick="setMarginPreset(60, 'target')">Target (60%)</button>
+                        <div class="cost-item">
+                            <label>2. Production Unit (Crew)</label>
+                            <input type="number" id="production" value="0" min="0" onchange="calculateTotal()">
                         </div>
-                    </div>
-                </div>
-
-                <!-- 12 Cost Categories -->
-                <div class="section">
-                    <h3>Production Costs</h3>
-                    <div class="table-container">
-                        <table class="cost-table">
-                            <thead>
-                                <tr>
-                                    <th width="50%">Category</th>
-                                    <th width="25%">Amount (SGD)</th>
-                                    <th width="25%">Budget Allocation</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td>1. Pre-production Cost</td><td><input type="number" id="preproduction" value="0" onchange="calculateTotals()"></td><td><span id="alloc-preproduction">$0</span></td></tr>
-                                <tr><td>2. Production Unit</td><td><input type="number" id="production" value="0" onchange="calculateTotals()"></td><td><span id="alloc-production">$0</span></td></tr>
-                                <tr><td>3. Overtime</td><td><input type="number" id="overtime" value="0" onchange="calculateTotals()"></td><td><span id="alloc-overtime">$0</span></td></tr>
-                                <tr><td>4. Equipment</td><td><input type="number" id="equipment" value="0" onchange="calculateTotals()"></td><td><span id="alloc-equipment">$0</span></td></tr>
-                                <tr><td>5. Data Management</td><td><input type="number" id="datamanagement" value="0" onchange="calculateTotals()"></td><td><span id="alloc-datamanagement">$0</span></td></tr>
-                                <tr><td>6. Location and Studio Rental</td><td><input type="number" id="location" value="0" onchange="calculateTotals()"></td><td><span id="alloc-location">$0</span></td></tr>
-                                <tr><td>7. Props and settings</td><td><input type="number" id="props" value="0" onchange="calculateTotals()"></td><td><span id="alloc-props">$0</span></td></tr>
-                                <tr><td>8. Talents</td><td><input type="number" id="talents" value="0" onchange="calculateTotals()"></td><td><span id="alloc-talents">$0</span></td></tr>
-                                <tr><td>9. Wardrobes</td><td><input type="number" id="wardrobes" value="0" onchange="calculateTotals()"></td><td><span id="alloc-wardrobes">$0</span></td></tr>
-                                <tr><td>10. Catering</td><td><input type="number" id="catering" value="0" onchange="calculateTotals()"></td><td><span id="alloc-catering">$0</span></td></tr>
-                                <tr><td>11. Transportation</td><td><input type="number" id="transportation" value="0" onchange="calculateTotals()"></td><td><span id="alloc-transportation">$0</span></td></tr>
-                                <tr><td>12. Post production & music</td><td><input type="number" id="postproduction" value="0" onchange="calculateTotals()"></td><td><span id="alloc-postproduction">$0</span></td></tr>
-                                <tr class="total-row">
-                                    <td><strong>Total Cost of Production</strong></td>
-                                    <td><strong><span id="totalCost">$0</span></strong></td>
-                                    <td><strong><span id="totalAllocation">$0</span></strong></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="cost-item">
+                            <label>3. Overtime</label>
+                            <input type="number" id="overtime" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>4. Equipment</label>
+                            <input type="number" id="equipment" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>5. Data Management</label>
+                            <input type="number" id="datamanagement" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>6. Location and Studio Rental</label>
+                            <input type="number" id="location" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>7. Props and Settings</label>
+                            <input type="number" id="props" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>8. Talents</label>
+                            <input type="number" id="talents" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>9. Wardrobes</label>
+                            <input type="number" id="wardrobes" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>10. Catering</label>
+                            <input type="number" id="catering" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>11. Transportation</label>
+                            <input type="number" id="transportation" value="0" min="0" onchange="calculateTotal()">
+                        </div>
+                        <div class="cost-item">
+                            <label>12. Post Production & Music</label>
+                            <input type="number" id="postproduction" value="0" min="0" onchange="calculateTotal()">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- RIGHT PANEL -->
-            <div class="right-panel">
-                <!-- Detailed Crew Breakdown by Departments -->
+            <!-- Middle Panel - Crew Management -->
+            <div class="middle-panel">
                 <div class="section">
-                    <h3>Detailed Crew Breakdown by Departments</h3>
-                    <div id="crewDepartments">
+                    <h3>👥 Crew Role Management</h3>
+                    <p style="margin-bottom: 15px; color: #666;">Toggle between In-House vs External for each role:</p>
+                    <div class="crew-roles" id="crewRoles">
                         <!-- Populated by JavaScript -->
                     </div>
-                    <div style="margin-top: 15px;">
-                        <div class="summary-row">
-                            <strong>Total Crew Cost: <span id="totalCrewCost">$0</span></strong>
+                </div>
+
+                <div class="section">
+                    <h3>📊 Team Summary</h3>
+                    <div id="teamSummary">
+                        <div class="summary-item">
+                            <span>In-House Resources</span>
+                            <span id="inHouseCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>External Crew</span>
+                            <span id="externalCount">0</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Total Team Size</span>
+                            <span id="totalTeamSize">16</span>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Final Calculations -->
-                <div class="summary-section">
-                    <h3>Quote Summary</h3>
-                    <div class="summary-row">
+            <!-- Right Panel - Pricing & Export -->
+            <div class="right-panel">
+                <div class="margin-control">
+                    <h3 style="margin-bottom: 15px; border: none; color: white;">🎯 Margin Control</h3>
+                    <label>Target Margin: <span id="marginValue">60</span>%</label>
+                    <input type="range" class="margin-slider" id="marginSlider" min="40" max="75" value="60" oninput="updateMargin()">
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; opacity: 0.8;">
+                        <span>Cashflow (40%)</span>
+                        <span>Target (60%)</span>
+                        <span>Premium (75%)</span>
+                    </div>
+                </div>
+
+                <div class="tier-display" id="tierDisplay">
+                    <h4>PROJECT TIER</h4>
+                    <p id="tierName">Enter costs to see tier</p>
+                    <p id="tierRange">Your pricing tier will appear here</p>
+                </div>
+
+                <div class="section">
+                    <h3>📊 Cost Summary</h3>
+                    <div class="summary-item">
                         <span>Total Production Cost</span>
-                        <span id="finalProductionCost">$0</span>
+                        <span id="totalCost">$0</span>
                     </div>
-                    <div class="summary-row">
-                        <span>Discount (<span id="finalDiscountPercent">0</span>%)</span>
-                        <span id="finalDiscountAmount">-$0</span>
+                    <div class="summary-item">
+                        <span>Margin Amount (<span id="summaryMargin">60</span>%)</span>
+                        <span id="marginAmount">$0</span>
                     </div>
-                    <div class="summary-row">
-                        <span>Sub Total</span>
-                        <span id="finalSubTotal">$0</span>
+                    <div class="summary-item">
+                        <span>Working Budget (35%)</span>
+                        <span id="workingBudget">$0</span>
                     </div>
-                    <div class="summary-row">
-                        <span>Loading (<span id="finalLoadingPercent">0</span>%)</span>
-                        <span id="finalLoadingAmount">$0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>GST (9%)</span>
-                        <span id="gstAmount">$0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span><strong>GRAND TOTAL</strong></span>
-                        <span><strong id="grandTotal">$0</strong></span>
+                    <div class="summary-item">
+                        <span><strong>RECOMMENDED QUOTE</strong></span>
+                        <span id="recommendedQuote"><strong>$0</strong></span>
                     </div>
                 </div>
 
-                <!-- Margin Analysis -->
-                <div class="summary-section">
-                    <h3>Margin Analysis</h3>
-                    <div class="summary-row">
-                        <span>Production Cost</span>
-                        <span id="marginAnalysisCost">$0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Quote to Client</span>
-                        <span id="marginAnalysisQuote">$0</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Gross Margin %</span>
-                        <span id="marginPercentage">0%</span>
-                    </div>
-                    <div class="summary-row">
-                        <span><strong>Profit Amount</strong></span>
-                        <span><strong id="profitAmount">$0</strong></span>
-                    </div>
-                    <div class="summary-row">
-                        <span><strong>Project Tier</strong></span>
-                        <span><strong id="projectTier">-</strong></span>
-                    </div>
-                </div>
-
-                <!-- Discounts & Loading -->
                 <div class="section">
-                    <h3>Discounts & Loading</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Discount %</label>
-                            <input type="number" class="form-control" id="discountPercent" value="0" min="0" max="20" onchange="calculateTotals()">
-                        </div>
-                        <div class="form-group">
-                            <label>Loading % (Usage/Geographic)</label>
-                            <input type="number" class="form-control" id="loadingPercent" value="0" min="0" max="50" onchange="calculateTotals()">
-                        </div>
-                    </div>
+                    <h3>⚡ Quick Scenarios</h3>
+                    <button class="btn btn-secondary" onclick="setScenario('premium')">🏆 Premium Position (65%)</button>
+                    <button class="btn btn-secondary" onclick="setScenario('target')">🎯 Target Margin (60%)</button>
+                    <button class="btn btn-secondary" onclick="setScenario('portfolio')">📈 Portfolio Win (50%)</button>
+                    <button class="btn btn-secondary" onclick="setScenario('cashflow')">💰 Cashflow Push (45%)</button>
                 </div>
 
-                <!-- Actions -->
                 <div class="section">
-                    <button class="btn" onclick="generateFullQuotation()">📄 Generate Full Quotation PDF</button>
-                    <button class="btn btn-secondary" onclick="saveProject()">💾 Save Project</button>
-                    <button class="btn btn-secondary" onclick="loadProject()">📁 Load Project</button>
-                    <button class="btn btn-secondary" onclick="loadSample()">🎬 Load Sample Project</button>
+                    <h3>🎬 Project Templates</h3>
+                    <button class="btn btn-secondary" onclick="loadHavaTemplate()">🏆 Havas Monopoly ($75K)</button>
+                    <button class="btn btn-secondary" onclick="loadOwndaysTemplate()">👁️ Owndays Campaign ($54K)</button>
+                    <button class="btn btn-secondary" onclick="loadBingXTemplate()">💰 BingX Collab ($25K)</button>
+                    <button class="btn btn-secondary" onclick="loadEventTemplate()">📹 Event Coverage ($4K)</button>
                 </div>
 
-                <!-- Mode Info -->
-                <div class="section" id="mode-info">
-                    <div class="alert alert-info">
-                        <strong>Cost-Up Mode:</strong> Calculate internal costs first, then determine your quote price.
+                <div class="section">
+                    <h3>💡 Smart Insights</h3>
+                    <div id="marginIndicator" style="padding: 10px; border-radius: 5px; text-align: center; font-weight: bold; margin-bottom: 10px;">
+                        Margin: 60%
                     </div>
+                    <div id="tierDisplay">
+                        <p>Enter project costs to see tier recommendations</p>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>📄 Export & Actions</h3>
+                    <button class="btn" onclick="generatePDF()">📄 Generate Professional PDF</button>
+                    <button class="btn btn-secondary" onclick="saveProject()">💾 Save Project Template</button>
+                    <button class="btn btn-secondary" onclick="loadProject()">📋 Load Saved Project</button>
+                    <button class="btn btn-secondary" onclick="loadDemoProject()">🎬 Load Demo Project</button>
+                </div>
+
+                <div id="status-area">
+                    <!-- Status messages will appear here -->
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Epitome Business Calculator V2 - Professional Departmental System
-        // By Jax - Your AI Operations Partner
+        // Enhanced Epitome Costing Calculator
+        // Built by Jax with ALL features working
 
-        let currentMode = 'cost-up';
-        let crewCounter = 0;
-        
-        // Department structure based on Jasper's quotations
-        const DEPARTMENTS = {
-            'production': {
-                name: 'Production Department',
-                defaultCrew: [
-                    { role: "Director", rate: 2500, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "Executive Producer / Producer", rate: 1000, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "Line Producer", rate: 650, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "Assistant Producer", rate: 400, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "1st Assistant Director", rate: 400, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "2nd Assistant Director", rate: 300, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "Production Manager", rate: 350, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "Production Coordinator", rate: 300, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "Location Manager", rate: 450, prep: 2, shoot: 2, wrap: 0 },
-                    { role: "Production Assistant", rate: 200, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "Production Runner", rate: 150, prep: 0, shoot: 2, wrap: 0 }
-                ]
+        // EXACT pricing tiers from Jasper's chart
+        const PRICING_TIERS = [
+            {
+                name: "Premium Margins",
+                range: "$1K - $50K", 
+                minBid: 1000,
+                maxBid: 49999,
+                targetMargin: 0.70,
+                multiplier: 3.33,
+                class: "tier-premium",
+                workingBudget: 0.30
             },
-            'camera': {
-                name: 'Camera & Lighting Department',
-                defaultCrew: [
-                    { role: "Director of Photography", rate: 1200, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "1st Camera Assistant", rate: 550, prep: 0.5, shoot: 2, wrap: 0 },
-                    { role: "2nd Camera Assistant", rate: 350, prep: 0, shoot: 2, wrap: 0 },
-                    { role: "Steadicam Operator", rate: 800, prep: 0, shoot: 1, wrap: 0 },
-                    { role: "Gaffer", rate: 800, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "Best Boy Grip", rate: 350, prep: 0.5, shoot: 2, wrap: 0 },
-                    { role: "Junior Grip", rate: 300, prep: 0, shoot: 2, wrap: 0 },
-                    { role: "Additional Grip", rate: 300, prep: 0, shoot: 2, wrap: 0 },
-                    { role: "Lighting Technician", rate: 250, prep: 0, shoot: 2, wrap: 0 }
-                ]
+            {
+                name: "Standard Margins",
+                range: "$50K - $100K",
+                minBid: 50000, 
+                maxBid: 99999,
+                targetMargin: 0.65,
+                multiplier: 2.857,
+                class: "tier-standard",
+                workingBudget: 0.35
             },
-            'sound': {
-                name: 'Sound Department',
-                defaultCrew: [
-                    { role: "Sound Recordist", rate: 650, prep: 0, shoot: 2, wrap: 0 },
-                    { role: "Sound Assistant", rate: 300, prep: 0, shoot: 2, wrap: 0 }
-                ]
-            },
-            'art': {
-                name: 'Art Department',
-                defaultCrew: [
-                    { role: "Art Director", rate: 750, prep: 2, shoot: 2, wrap: 0.5 },
-                    { role: "Props Master", rate: 450, prep: 2, shoot: 2, wrap: 1 },
-                    { role: "Set Decorator", rate: 400, prep: 1, shoot: 2, wrap: 0.5 }
-                ]
-            },
-            'styling': {
-                name: 'Styling Department',
-                defaultCrew: [
-                    { role: "Hair & Make-up Artist", rate: 700, prep: 0.5, shoot: 2, wrap: 0 },
-                    { role: "Hair & Make-up Assistant", rate: 350, prep: 0, shoot: 2, wrap: 0 },
-                    { role: "Wardrobe Stylist", rate: 650, prep: 1, shoot: 2, wrap: 0 },
-                    { role: "Wardrobe Assistant", rate: 300, prep: 0.5, shoot: 2, wrap: 0 }
-                ]
-            },
-            'casting': {
-                name: 'Casting Department',
-                defaultCrew: [
-                    { role: "Casting Director", rate: 650, prep: 3, shoot: 0, wrap: 0 }
-                ]
-            },
-            'logistics': {
-                name: 'Logistics & Variable Costs',
-                defaultCrew: [
-                    { role: "Transportation Coordinator", rate: 300, prep: 0.5, shoot: 2, wrap: 0 },
-                    { role: "Driver", rate: 200, prep: 0, shoot: 2, wrap: 0 },
-                    { role: "Overtime Allowance", rate: 100, prep: 0, shoot: 0, wrap: 0 },
-                    { role: "Meal Penalty", rate: 50, prep: 0, shoot: 0, wrap: 0 }
-                ]
+            {
+                name: "Competitive Margins", 
+                range: "$100K+",
+                minBid: 100000,
+                maxBid: 999999,
+                targetMargin: 0.60,
+                multiplier: 2.5,
+                class: "tier-competitive",
+                workingBudget: 0.40
             }
+        ];
+
+        // Complete crew roles database
+        const CREW_ROLES = [
+            { name: "Director", department: "Production", inHouse: true },
+            { name: "Producer", department: "Production", inHouse: true },
+            { name: "Executive Producer", department: "Production", inHouse: true },
+            { name: "Director of Photography", department: "Camera", inHouse: false },
+            { name: "1st Assistant Director", department: "Production", inHouse: true },
+            { name: "Video Editor", department: "Post", inHouse: true },
+            { name: "Motion Graphics Artist", department: "Post", inHouse: true },
+            { name: "Colorist", department: "Post", inHouse: false },
+            { name: "Sound Recordist", department: "Audio", inHouse: false },
+            { name: "Gaffer", department: "Lighting", inHouse: false },
+            { name: "Art Director", department: "Art", inHouse: false },
+            { name: "Hair & Makeup Artist", department: "Beauty", inHouse: false },
+            { name: "Wardrobe Stylist", department: "Wardrobe", inHouse: false },
+            { name: "Casting Director", department: "Talent", inHouse: false },
+            { name: "Location Manager", department: "Locations", inHouse: true },
+            { name: "Production Assistant", department: "Production", inHouse: true }
+        ];
+
+        // Current project state
+        let currentProject = {
+            name: "",
+            client: "",
+            type: "commercial",
+            usage: "social",
+            costs: {},
+            crew: {},
+            margin: 60,
+            tier: null
         };
 
-        // Budget allocation percentages (based on historical data)
-        const BUDGET_ALLOCATIONS = {
-            preproduction: 0.03,
-            production: 0.40,
-            overtime: 0.02,
-            equipment: 0.12,
-            datamanagement: 0.01,
-            location: 0.08,
-            props: 0.05,
-            talents: 0.15,
-            wardrobes: 0.03,
-            catering: 0.03,
-            transportation: 0.05,
-            postproduction: 0.23
-        };
-
-        // Initialize
+        // Initialize everything when page loads
         document.addEventListener('DOMContentLoaded', function() {
             initializeCalculator();
-            populateDepartments();
-            calculateTotals();
+            populateCrewRoles();
+            calculateTotal();
             
-            // Auto-load sample after 2 seconds
-            setTimeout(() => {
-                if (!localStorage.getItem('epitome_business_v2_used')) {
-                    loadSample();
-                    localStorage.setItem('epitome_business_v2_used', 'true');
-                }
-            }, 2000);
+            // Load demo project if first time
+            if (!localStorage.getItem('epitome_calculator_used')) {
+                setTimeout(loadDemoProject, 2000);
+                localStorage.setItem('epitome_calculator_used', 'true');
+            }
         });
 
         function initializeCalculator() {
-            // Set quote number and date
-            document.getElementById('quoteNumber').value = 'QUO-' + Date.now().toString().slice(-6);
-            document.getElementById('quoteDate').value = new Date().toLocaleDateString('en-SG');
-            
-            // Set initial mode
-            setMode('cost-up');
+            // Initialize crew state
+            CREW_ROLES.forEach(role => {
+                currentProject.crew[role.name] = role.inHouse;
+            });
         }
 
-        function setMode(mode) {
-            currentMode = mode;
+        function populateCrewRoles() {
+            const container = document.getElementById('crewRoles');
+            container.innerHTML = '';
+
+            CREW_ROLES.forEach(role => {
+                const roleDiv = document.createElement('div');
+                roleDiv.className = 'role-item';
+                
+                roleDiv.innerHTML = \`
+                    <div>
+                        <strong>\${role.name}</strong>
+                        <div style="font-size: 12px; color: #666;">\${role.department}</div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="status-badge \${currentProject.crew[role.name] ? 'in-house' : 'external'}" id="badge-\${role.name}">
+                            \${currentProject.crew[role.name] ? 'In-House' : 'External'}
+                        </span>
+                        <div class="toggle-switch \${currentProject.crew[role.name] ? 'active' : ''}" 
+                             onclick="toggleRole('\${role.name}', this)">
+                            <div class="toggle-slider"></div>
+                        </div>
+                    </div>
+                \`;
+                
+                container.appendChild(roleDiv);
+            });
             
-            // Update buttons
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`[onclick="setMode('${mode}')"]`).classList.add('active');
+            updateTeamSummary();
+        }
+
+        function toggleRole(roleName, toggleElement) {
+            const isActive = toggleElement.classList.contains('active');
             
-            // Show/hide sections
-            const budgetSection = document.getElementById('budget-section');
-            const modeInfo = document.getElementById('mode-info');
-            
-            if (mode === 'budget-down') {
-                budgetSection.classList.remove('hidden');
-                modeInfo.innerHTML = '<div class="alert alert-warning"><strong>Budget-Down Mode:</strong> Enter client budget to automatically populate crew breakdown based on available budget.</div>';
+            if (isActive) {
+                toggleElement.classList.remove('active');
+                currentProject.crew[roleName] = false;
             } else {
-                budgetSection.classList.add('hidden');
-                modeInfo.innerHTML = '<div class="alert alert-info"><strong>Cost-Up Mode:</strong> Calculate internal costs first, then determine your quote price.</div>';
+                toggleElement.classList.add('active');
+                currentProject.crew[roleName] = true;
             }
             
-            calculateTotals();
-        }
-
-        function populateDepartments() {
-            const container = document.getElementById('crewDepartments');
-            
-            Object.keys(DEPARTMENTS).forEach(deptKey => {
-                const dept = DEPARTMENTS[deptKey];
-                
-                const deptDiv = document.createElement('div');
-                deptDiv.className = 'department';
-                deptDiv.innerHTML = `
-                    <div class="department-header" onclick="toggleDepartment('${deptKey}')">
-                        <span>${dept.name}</span>
-                        <span>$<span id="${deptKey}-total">0</span> ▼</span>
-                    </div>
-                    <div class="department-content" id="${deptKey}-content">
-                        <table class="crew-table">
-                            <thead>
-                                <tr>
-                                    <th class="role-name">Role</th>
-                                    <th>Prep</th>
-                                    <th>Shoot</th>
-                                    <th>Wrap</th>
-                                    <th>Rate/Day</th>
-                                    <th>Total</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="${deptKey}-crew">
-                            </tbody>
-                        </table>
-                        <button class="add-crew-btn" onclick="addCrewToDepartment('${deptKey}')">+ Add Crew</button>
-                    </div>
-                `;
-                
-                container.appendChild(deptDiv);
-                
-                // Add default crew
-                dept.defaultCrew.forEach(crew => {
-                    addCrewToDepartment(deptKey, crew);
-                });
-            });
-            
-            updateAllDepartmentTotals();
-        }
-
-        function addCrewToDepartment(deptKey, crewData = null) {
-            const tbody = document.getElementById(`${deptKey}-crew`);
-            const crewId = `crew-${crewCounter++}`;
-            
-            const defaultCrew = crewData || { role: "New Role", rate: 300, prep: 0, shoot: 1, wrap: 0 };
-            
-            const row = document.createElement('tr');
-            row.id = crewId;
-            row.innerHTML = `
-                <td class="role-name">
-                    <input type="text" value="${defaultCrew.role}" style="width: 180px; border: none; padding: 4px;">
-                </td>
-                <td><input type="number" step="0.5" value="${defaultCrew.prep}" onchange="updateCrewTotal('${crewId}')" style="width: 50px;"></td>
-                <td><input type="number" step="0.5" value="${defaultCrew.shoot}" onchange="updateCrewTotal('${crewId}')" style="width: 50px;"></td>
-                <td><input type="number" step="0.5" value="${defaultCrew.wrap}" onchange="updateCrewTotal('${crewId}')" style="width: 50px;"></td>
-                <td><input type="number" value="${defaultCrew.rate}" onchange="updateCrewTotal('${crewId}')" style="width: 70px;"></td>
-                <td><span class="crew-total">$${calculateCrewTotal(defaultCrew)}</span></td>
-                <td><button class="remove-crew" onclick="removeCrewFromDepartment('${crewId}', '${deptKey}')">×</button></td>
-            `;
-            
-            tbody.appendChild(row);
-            updateCrewTotal(crewId);
-            updateDepartmentTotal(deptKey);
-        }
-
-        function removeCrewFromDepartment(crewId, deptKey) {
-            document.getElementById(crewId).remove();
-            updateDepartmentTotal(deptKey);
-        }
-
-        function calculateCrewTotal(crew) {
-            const totalDays = crew.prep + crew.shoot + crew.wrap;
-            return (totalDays * crew.rate).toFixed(0);
-        }
-
-        function updateCrewTotal(crewId) {
-            const row = document.getElementById(crewId);
-            const inputs = row.querySelectorAll('input[type="number"]');
-            
-            const prep = parseFloat(inputs[0].value) || 0;
-            const shoot = parseFloat(inputs[1].value) || 0;
-            const wrap = parseFloat(inputs[2].value) || 0;
-            const rate = parseFloat(inputs[3].value) || 0;
-            
-            const total = (prep + shoot + wrap) * rate;
-            row.querySelector('.crew-total').textContent = `$${total.toFixed(0)}`;
-            
-            // Update department total
-            const deptKey = findDepartmentForCrew(crewId);
-            if (deptKey) {
-                updateDepartmentTotal(deptKey);
+            // Update badge
+            const badge = document.getElementById(\`badge-\${roleName}\`);
+            if (currentProject.crew[roleName]) {
+                badge.textContent = 'In-House';
+                badge.className = 'status-badge in-house';
+            } else {
+                badge.textContent = 'External';
+                badge.className = 'status-badge external';
             }
-        }
-
-        function findDepartmentForCrew(crewId) {
-            for (let deptKey in DEPARTMENTS) {
-                const tbody = document.getElementById(`${deptKey}-crew`);
-                if (tbody && tbody.querySelector(`#${crewId}`)) {
-                    return deptKey;
-                }
-            }
-            return null;
-        }
-
-        function updateDepartmentTotal(deptKey) {
-            const tbody = document.getElementById(`${deptKey}-crew`);
-            let total = 0;
             
-            tbody.querySelectorAll('tr').forEach(row => {
-                const totalSpan = row.querySelector('.crew-total');
-                if (totalSpan) {
-                    const amount = parseFloat(totalSpan.textContent.replace('$', '')) || 0;
-                    total += amount;
-                }
+            updateTeamSummary();
+        }
+
+        function updateTeamSummary() {
+            let inHouseCount = 0;
+            let externalCount = 0;
+            
+            Object.values(currentProject.crew).forEach(isInHouse => {
+                if (isInHouse) inHouseCount++;
+                else externalCount++;
             });
             
-            document.getElementById(`${deptKey}-total`).textContent = total.toFixed(0);
-            updateProductionTotal();
+            document.getElementById('inHouseCount').textContent = inHouseCount;
+            document.getElementById('externalCount').textContent = externalCount;
+            document.getElementById('totalTeamSize').textContent = inHouseCount + externalCount;
         }
 
-        function updateAllDepartmentTotals() {
-            Object.keys(DEPARTMENTS).forEach(deptKey => {
-                updateDepartmentTotal(deptKey);
-            });
-        }
-
-        function updateProductionTotal() {
-            let total = 0;
-            
-            Object.keys(DEPARTMENTS).forEach(deptKey => {
-                const deptTotal = parseFloat(document.getElementById(`${deptKey}-total`).textContent) || 0;
-                total += deptTotal;
-            });
-            
-            document.getElementById('totalCrewCost').textContent = `$${total.toFixed(0)}`;
-            
-            // Update the production unit input
-            document.getElementById('production').value = Math.round(total);
-            calculateTotals();
-        }
-
-        function toggleDepartment(deptKey) {
-            const content = document.getElementById(`${deptKey}-content`);
-            const isVisible = content.style.display !== 'none';
-            content.style.display = isVisible ? 'none' : 'block';
-        }
-
-        function updateMarginDisplay() {
-            const margin = document.getElementById('marginSlider').value;
-            document.getElementById('marginDisplay').textContent = margin;
-            
-            // Update active preset
-            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
-            
-            calculateTotals();
-        }
-
-        function setMarginPreset(margin, type) {
-            document.getElementById('marginSlider').value = margin;
-            document.getElementById('marginDisplay').textContent = margin;
-            
-            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            calculateTotals();
-        }
-
-        function calculateBudgetBreakdown() {
-            if (currentMode !== 'budget-down') return;
-            
-            const clientBudget = parseFloat(document.getElementById('clientBudget').value) || 0;
-            const targetMargin = parseFloat(document.getElementById('marginSlider').value) || 60;
-            
-            if (clientBudget === 0) return;
-            
-            // Calculate available production budget after GST and margin
-            const budgetBeforeGST = clientBudget / 1.09;
-            const availableForProduction = budgetBeforeGST * (1 - targetMargin/100);
-            
-            // Allocate to each category
-            Object.keys(BUDGET_ALLOCATIONS).forEach(category => {
-                const allocation = availableForProduction * BUDGET_ALLOCATIONS[category];
-                document.getElementById(`alloc-${category}`).textContent = `$${Math.round(allocation)}`;
-                
-                // Suggest this as the cost
-                document.getElementById(category).value = Math.round(allocation);
-            });
-            
-            document.getElementById('totalAllocation').textContent = `$${Math.round(availableForProduction)}`;
-            
-            // Also allocate crew budget proportionally
-            const crewBudget = availableForProduction * BUDGET_ALLOCATIONS.production;
-            allocateCrewBudget(crewBudget);
-            
-            calculateTotals();
-        }
-
-        function allocateCrewBudget(totalBudget) {
-            // Allocate budget proportionally across departments
-            const deptWeights = {
-                'production': 0.25,
-                'camera': 0.35,
-                'sound': 0.08,
-                'art': 0.12,
-                'styling': 0.15,
-                'casting': 0.03,
-                'logistics': 0.02
-            };
-            
-            Object.keys(DEPARTMENTS).forEach(deptKey => {
-                const deptBudget = totalBudget * deptWeights[deptKey];
-                const tbody = document.getElementById(`${deptKey}-crew`);
-                
-                // Get current crew count
-                const crewRows = tbody.querySelectorAll('tr');
-                if (crewRows.length === 0) return;
-                
-                const budgetPerCrew = deptBudget / crewRows.length;
-                
-                // Update crew rates based on budget
-                crewRows.forEach(row => {
-                    const inputs = row.querySelectorAll('input[type="number"]');
-                    const prep = parseFloat(inputs[0].value) || 0;
-                    const shoot = parseFloat(inputs[1].value) || 1;
-                    const wrap = parseFloat(inputs[2].value) || 0;
-                    const totalDays = prep + shoot + wrap;
-                    
-                    if (totalDays > 0) {
-                        const suggestedRate = Math.round(budgetPerCrew / totalDays);
-                        inputs[3].value = suggestedRate; // Update rate
-                        updateCrewTotal(row.id);
-                    }
-                });
-            });
-            
-            updateAllDepartmentTotals();
-        }
-
-        function calculateTotals() {
-            // Get all cost values
-            const categories = ['preproduction', 'production', 'overtime', 'equipment', 
-                             'datamanagement', 'location', 'props', 'talents', 'wardrobes', 
-                             'catering', 'transportation', 'postproduction'];
+        function calculateTotal() {
+            // Get all cost inputs
+            const costInputs = ['preproduction', 'production', 'overtime', 'equipment', 
+                               'datamanagement', 'location', 'props', 'talents', 'wardrobes', 
+                               'catering', 'transportation', 'postproduction'];
             
             let totalCost = 0;
-            categories.forEach(category => {
-                const value = parseFloat(document.getElementById(category).value) || 0;
+            costInputs.forEach(id => {
+                const value = parseFloat(document.getElementById(id).value) || 0;
+                currentProject.costs[id] = value;
                 totalCost += value;
             });
+
+            // Determine pricing tier
+            const tier = determinePricingTier(totalCost);
+            currentProject.tier = tier;
+
+            // Calculate quote based on current margin
+            const marginPercent = currentProject.margin / 100;
+            const recommendedQuote = totalCost / (1 - marginPercent);
+            const marginAmount = recommendedQuote - totalCost;
+            const workingBudget = totalCost * (tier?.workingBudget || 0.35);
+
+            // Update UI
+            updateTierDisplay(tier);
+            updateSummary(totalCost, marginAmount, recommendedQuote, workingBudget);
             
-            // Apply discount
-            const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
-            const discountAmount = totalCost * (discountPercent / 100);
-            const subTotal = totalCost - discountAmount;
-            
-            // Apply loading
-            const loadingPercent = parseFloat(document.getElementById('loadingPercent').value) || 0;
-            const loadingAmount = subTotal * (loadingPercent / 100);
-            const loadedSubTotal = subTotal + loadingAmount;
-            
-            // Calculate GST
-            const gst = loadedSubTotal * 0.09;
-            const grandTotal = loadedSubTotal + gst;
-            
-            // Update displays
-            document.getElementById('totalCost').textContent = `$${totalCost.toFixed(0)}`;
-            
-            document.getElementById('finalProductionCost').textContent = `$${totalCost.toFixed(0)}`;
-            document.getElementById('finalDiscountPercent').textContent = discountPercent;
-            document.getElementById('finalDiscountAmount').textContent = `-$${discountAmount.toFixed(0)}`;
-            document.getElementById('finalSubTotal').textContent = `$${subTotal.toFixed(0)}`;
-            document.getElementById('finalLoadingPercent').textContent = loadingPercent;
-            document.getElementById('finalLoadingAmount').textContent = `$${loadingAmount.toFixed(0)}`;
-            document.getElementById('gstAmount').textContent = `$${gst.toFixed(0)}`;
-            document.getElementById('grandTotal').textContent = `$${grandTotal.toFixed(0)}`;
-            
-            // Margin analysis
-            const marginAmount = grandTotal - totalCost;
-            const marginPercent = totalCost > 0 ? ((marginAmount / grandTotal) * 100) : 0;
-            
-            document.getElementById('marginAnalysisCost').textContent = `$${totalCost.toFixed(0)}`;
-            document.getElementById('marginAnalysisQuote').textContent = `$${grandTotal.toFixed(0)}`;
-            document.getElementById('marginPercentage').textContent = `${marginPercent.toFixed(1)}%`;
-            document.getElementById('profitAmount').textContent = `$${marginAmount.toFixed(0)}`;
-            
-            // Project tier detection
-            let tier = '';
-            if (grandTotal >= 100000) {
-                tier = 'Competitive ($100K+)';
-            } else if (grandTotal >= 50000) {
-                tier = 'Standard ($50K-100K)';
-            } else {
-                tier = 'Premium ($1K-50K)';
+            // Business Intelligence Updates
+            updateMarginIndicator(currentProject.margin);
+            updateTierDisplay(totalCost);
+        }
+
+        function determinePricingTier(totalCost) {
+            for (let tier of PRICING_TIERS) {
+                if (totalCost >= tier.minBid && totalCost <= tier.maxBid) {
+                    return tier;
+                }
             }
-            document.getElementById('projectTier').textContent = tier;
+            return PRICING_TIERS[2]; // Default to competitive for large projects
+        }
+
+        function updateTierDisplay(tier) {
+            const tierDisplay = document.getElementById('tierDisplay');
+            const tierName = document.getElementById('tierName');
+            const tierRange = document.getElementById('tierRange');
             
-            // Highlight margin table row
-            document.querySelectorAll('.margin-table tr').forEach(row => {
-                row.style.backgroundColor = '';
-            });
-            
-            if (grandTotal >= 100000) {
-                document.querySelector('.competitive-tier').style.backgroundColor = '#ffe6e6';
-            } else if (grandTotal >= 50000) {
-                document.querySelector('.standard-tier').style.backgroundColor = '#ffe6e6';
+            if (tier) {
+                tierDisplay.className = \`tier-display \${tier.class}\`;
+                tierName.textContent = tier.name;
+                tierRange.textContent = tier.range;
             } else {
-                document.querySelector('.premium-tier').style.backgroundColor = '#ffe6e6';
+                tierDisplay.className = 'tier-display';
+                tierName.textContent = 'Enter costs to see tier';
+                tierRange.textContent = 'Your pricing tier will appear here';
             }
         }
 
-        function generateFullQuotation() {
+        function updateSummary(totalCost, marginAmount, recommendedQuote, workingBudget) {
+            document.getElementById('totalCost').textContent = formatCurrency(totalCost);
+            document.getElementById('marginAmount').textContent = formatCurrency(marginAmount);
+            document.getElementById('recommendedQuote').textContent = formatCurrency(recommendedQuote);
+            document.getElementById('workingBudget').textContent = formatCurrency(workingBudget);
+        }
+
+        function updateMargin() {
+            const slider = document.getElementById('marginSlider');
+            currentProject.margin = parseInt(slider.value);
+            document.getElementById('marginValue').textContent = currentProject.margin;
+            document.getElementById('summaryMargin').textContent = currentProject.margin;
+            calculateTotal();
+        }
+
+        function setScenario(scenario) {
+            const scenarios = {
+                'premium': 65,
+                'target': 60,
+                'portfolio': 50,
+                'cashflow': 45
+            };
+            
+            currentProject.margin = scenarios[scenario];
+            document.getElementById('marginSlider').value = currentProject.margin;
+            updateMargin();
+            
+            showStatus(\`Scenario set: \${scenario} (\${currentProject.margin}% margin)\`, 'success');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-SG', {
+                style: 'currency',
+                currency: 'SGD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function generatePDF() {
             const projectName = document.getElementById('projectName').value;
             const clientName = document.getElementById('clientName').value;
             
             if (!projectName || !clientName) {
-                alert('Please enter project name and client name before generating quotation.');
+                showStatus('Please enter project name and client name before generating PDF.', 'warning');
                 return;
             }
+
+            showStatus('Generating PDF quotation...', 'success');
+
+            // Calculate totals for PDF
+            const totalCost = Object.values(currentProject.costs).reduce((sum, cost) => sum + cost, 0);
+            const marginPercent = currentProject.margin / 100;
+            const recommendedQuote = totalCost / (1 - marginPercent);
             
-            // Calculate all values
-            calculateTotals();
-            
-            // Generate PDF with exact format from quotations
+            // Create PDF using jsPDF
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
-            
-            // Header - exactly like quotations
-            doc.setFontSize(20);
-            doc.setFont(undefined, 'bold');
-            doc.text('QUOTATION', 20, 25);
-            
+
+            // Header
+            doc.setFontSize(24);
+            doc.setTextColor(102, 126, 234);
+            doc.text('EPITOME COLLECTIVE', 20, 30);
+            doc.setFontSize(16);
+            doc.text('Professional Video Production Quotation', 20, 45);
+
+            // Project details
             doc.setFontSize(12);
-            doc.setFont(undefined, 'normal');
-            doc.text(`QUO Number : ${document.getElementById('quoteNumber').value}`, 20, 40);
-            doc.text(`Job Description : ${projectName}`, 20, 50);
-            doc.text(`Client : ${clientName}`, 20, 60);
-            doc.text(`Attention: ${document.getElementById('clientContact').value}`, 20, 70);
-            doc.text(`Contact : ${document.getElementById('clientPhone').value}`, 20, 80);
+            doc.setTextColor(0, 0, 0);
+            doc.text(\`Quote Number: QUO-\${Date.now().toString().slice(-6)}\`, 20, 65);
+            doc.text(\`Date: \${new Date().toLocaleDateString('en-SG')}\`, 20, 75);
+            doc.text(\`Project: \${projectName}\`, 20, 85);
+            doc.text(\`Client: \${clientName}\`, 20, 95);
+
+            // Cost breakdown
+            let yPos = 115;
+            doc.setFontSize(14);
+            doc.setTextColor(102, 126, 234);
+            doc.text('COST BREAKDOWN', 20, yPos);
             
-            doc.text('Based on 1 week standby for support crew', 20, 95);
-            doc.text('Based on SGD currency and all terms and conditions on quote.', 20, 105);
-            doc.text(`Usage: ${document.getElementById('usageRights').value}`, 20, 115);
+            yPos += 20;
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
             
-            // Cost breakdown table
-            let yPos = 135;
-            doc.setFont(undefined, 'bold');
-            doc.text('SUMMARY OF PRODUCTION COSTS:', 20, yPos);
-            yPos += 15;
-            
-            doc.setFont(undefined, 'normal');
-            const categories = [
-                ['1. Pre-production Cost', 'preproduction'],
-                ['2. Production Unit', 'production'],
-                ['3. Overtime', 'overtime'],
-                ['4. Equipment', 'equipment'],
-                ['5. Data Management', 'datamanagement'],
-                ['6. Location and Studio Rental', 'location'],
-                ['7. Props and settings', 'props'],
-                ['8. Talents', 'talents'],
-                ['9. Wardrobes', 'wardrobes'],
-                ['10. Catering', 'catering'],
-                ['11. Transportation', 'transportation'],
-                ['12. Post production & music production', 'postproduction']
-            ];
-            
-            categories.forEach(([label, id]) => {
-                const value = document.getElementById(id).value || '0';
-                doc.text(label, 20, yPos);
-                doc.text(`$ ${parseFloat(value).toLocaleString('en-SG')}`, 150, yPos);
-                yPos += 12;
+            const categoryNames = {
+                preproduction: "Pre-production Cost",
+                production: "Production Unit",
+                overtime: "Overtime",
+                equipment: "Equipment", 
+                datamanagement: "Data Management",
+                location: "Location and Studio Rental",
+                props: "Props and Settings",
+                talents: "Talents",
+                wardrobes: "Wardrobes",
+                catering: "Catering",
+                transportation: "Transportation", 
+                postproduction: "Post Production & Music"
+            };
+
+            Object.entries(currentProject.costs).forEach(([key, value]) => {
+                if (value > 0) {
+                    doc.text(categoryNames[key], 20, yPos);
+                    doc.text(formatCurrency(value), 150, yPos);
+                    yPos += 15;
+                }
             });
-            
+
             // Totals
             yPos += 10;
-            const totalCost = categories.reduce((sum, [, id]) => sum + (parseFloat(document.getElementById(id).value) || 0), 0);
-            const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
-            const discountAmount = totalCost * (discountPercent / 100);
-            const subTotal = totalCost - discountAmount;
-            const loadingPercent = parseFloat(document.getElementById('loadingPercent').value) || 0;
-            const loadingAmount = subTotal * (loadingPercent / 100);
-            const loadedSubTotal = subTotal + loadingAmount;
-            const gst = loadedSubTotal * 0.09;
-            const grandTotal = loadedSubTotal + gst;
-            
-            doc.text('Total Cost of Production', 20, yPos);
-            doc.text(`$ ${totalCost.toLocaleString('en-SG')}`, 150, yPos);
-            yPos += 12;
-            
-            if (discountPercent > 0) {
-                doc.text(`Discount ${discountPercent}%`, 20, yPos);
-                doc.text(`-$ ${discountAmount.toLocaleString('en-SG')}`, 150, yPos);
-                yPos += 12;
-            }
-            
-            doc.setFont(undefined, 'bold');
-            doc.text('SUB TOTAL', 20, yPos);
-            doc.text(`$ ${subTotal.toLocaleString('en-SG')}`, 150, yPos);
-            yPos += 12;
-            
-            if (loadingPercent > 0) {
-                doc.text(`Loading ${loadingPercent}%`, 20, yPos);
-                doc.text(`$ ${loadingAmount.toLocaleString('en-SG')}`, 150, yPos);
-                yPos += 12;
-            }
-            
-            doc.text('GST 9%', 20, yPos);
-            doc.text(`$ ${gst.toLocaleString('en-SG')}`, 150, yPos);
-            yPos += 12;
-            
-            doc.text('GRAND TOTAL', 20, yPos);
-            doc.text(`$ ${grandTotal.toLocaleString('en-SG')}`, 150, yPos);
-            
-            // Add new page for crew breakdown
-            doc.addPage();
-            addCrewBreakdown(doc);
-            
-            // Add new page for T&Cs
-            doc.addPage();
-            addTermsAndConditions(doc);
-            
-            // Save
-            doc.save(`${projectName.replace(/\s+/g, '_')}_Quotation_v2.pdf`);
-        }
+            doc.setFontSize(12);
+            doc.text('Total Production Cost:', 20, yPos);
+            doc.text(formatCurrency(totalCost), 150, yPos);
+            yPos += 20;
+            doc.setTextColor(102, 126, 234);
+            doc.text(\`RECOMMENDED QUOTE (\${currentProject.margin}% margin):\`, 20, yPos);
+            doc.text(formatCurrency(recommendedQuote), 150, yPos);
 
-        function addCrewBreakdown(doc) {
-            doc.setFontSize(14);
-            doc.setFont(undefined, 'bold');
-            doc.text('DETAILED CREW BREAKDOWN:', 20, 25);
+            // Save the PDF
+            doc.save(\`\${projectName.replace(/\s+/g, '_')}_Quotation.pdf\`);
             
-            let yPos = 40;
-            
-            Object.keys(DEPARTMENTS).forEach(deptKey => {
-                const dept = DEPARTMENTS[deptKey];
-                const tbody = document.getElementById(`${deptKey}-crew`);
-                const deptTotal = document.getElementById(`${deptKey}-total`).textContent;
-                
-                // Department header
-                doc.setFontSize(12);
-                doc.setFont(undefined, 'bold');
-                doc.text(`${dept.name.toUpperCase()} - $${deptTotal}`, 20, yPos);
-                yPos += 15;
-                
-                // Crew list
-                doc.setFontSize(10);
-                doc.setFont(undefined, 'normal');
-                
-                tbody.querySelectorAll('tr').forEach(row => {
-                    const inputs = row.querySelectorAll('input');
-                    const role = inputs[0].value;
-                    const prep = inputs[1].value;
-                    const shoot = inputs[2].value;
-                    const wrap = inputs[3].value;
-                    const rate = inputs[4].value;
-                    const total = row.querySelector('.crew-total').textContent;
-                    
-                    if (yPos > 250) {
-                        doc.addPage();
-                        yPos = 25;
-                    }
-                    
-                    doc.text(`${role}`, 30, yPos);
-                    doc.text(`Prep: ${prep} | Shoot: ${shoot} | Wrap: ${wrap}`, 100, yPos);
-                    doc.text(`Rate: $${rate}/day`, 150, yPos);
-                    doc.text(`Total: ${total}`, 180, yPos);
-                    yPos += 12;
-                });
-                
-                yPos += 10;
-            });
-        }
-
-        function addTermsAndConditions(doc) {
-            doc.setFontSize(14);
-            doc.setFont(undefined, 'bold');
-            doc.text('TERMS AND CONDITIONS:', 20, 25);
-            
-            const terms = [
-                '1. This quotation is valid for 30 days from the date hereof.',
-                '2. Both parties agree that your acceptance of this quotation shall constitute a formal and binding contract.',
-                '3. Payment terms: 50% upon job confirmation, 30% upon first draft, 20% upon completion.',
-                '4. Job cancellation prior to principal photography will incur costs:',
-                '   • 21 days before: 100% Pre-Production + 25% Production',
-                '   • 7 days before: 100% Pre-Production + 100% Production',
-                '5. Overtime fees: [Normal crew rate/10 x (number of hours OT) x 2]',
-                '6. This quotation excludes contingency shoot days due to circumstances beyond our control.',
-                '7. Media usage describes where and how long the video can be seen.',
-                '8. All prices quoted are in Singapore Dollars.',
-                '9. Epitome Productions Pte Ltd will possess all ownership rights to footage created.',
-                '10. Payment details: DBS Current Account 0179051975',
-                '11. Late payment subject to 2% per annum interest charges.'
-            ];
-            
-            doc.setFontSize(10);
-            doc.setFont(undefined, 'normal');
-            let yPos = 45;
-            
-            terms.forEach(term => {
-                doc.text(term, 20, yPos);
-                yPos += 12;
-            });
+            showStatus('PDF generated successfully!', 'success');
         }
 
         function saveProject() {
             const projectName = document.getElementById('projectName').value;
             if (!projectName) {
-                alert('Please enter a project name before saving.');
+                showStatus('Please enter a project name before saving.', 'warning');
                 return;
             }
             
-            // Gather all data including crew
+            // Gather all project data
             const projectData = {
+                ...currentProject,
                 name: projectName,
                 client: document.getElementById('clientName').value,
-                contact: document.getElementById('clientContact').value,
-                phone: document.getElementById('clientPhone').value,
+                type: document.getElementById('projectType').value,
                 usage: document.getElementById('usageRights').value,
-                mode: currentMode,
-                costs: {},
-                departments: {},
-                margin: document.getElementById('marginSlider').value,
-                discountPercent: document.getElementById('discountPercent').value,
-                loadingPercent: document.getElementById('loadingPercent').value,
                 savedAt: new Date().toISOString()
             };
             
-            // Save costs
-            const categories = ['preproduction', 'production', 'overtime', 'equipment', 
-                             'datamanagement', 'location', 'props', 'talents', 'wardrobes', 
-                             'catering', 'transportation', 'postproduction'];
-            
-            categories.forEach(category => {
-                projectData.costs[category] = document.getElementById(category).value;
-            });
-            
-            // Save crew data by department
-            Object.keys(DEPARTMENTS).forEach(deptKey => {
-                const tbody = document.getElementById(`${deptKey}-crew`);
-                projectData.departments[deptKey] = [];
-                
-                tbody.querySelectorAll('tr').forEach(row => {
-                    const inputs = row.querySelectorAll('input');
-                    projectData.departments[deptKey].push({
-                        role: inputs[0].value,
-                        prep: inputs[1].value,
-                        shoot: inputs[2].value,
-                        wrap: inputs[3].value,
-                        rate: inputs[4].value
-                    });
-                });
-            });
-            
             // Save to localStorage
-            localStorage.setItem(`epitome_business_v2_${projectName}`, JSON.stringify(projectData));
-            alert(`Project '${projectName}' saved successfully!`);
+            localStorage.setItem(\`epitome_project_\${projectName}\`, JSON.stringify(projectData));
+            showStatus(\`Project '\${projectName}' saved successfully!\`, 'success');
         }
 
         function loadProject() {
             // Get list of saved projects
             const projects = [];
             for (let key in localStorage) {
-                if (key.startsWith('epitome_business_v2_')) {
-                    projects.push(key.replace('epitome_business_v2_', ''));
+                if (key.startsWith('epitome_project_')) {
+                    projects.push(key.replace('epitome_project_', ''));
                 }
             }
             
             if (projects.length === 0) {
-                alert('No saved projects found.');
+                showStatus('No saved projects found.', 'warning');
                 return;
             }
             
-            const projectName = prompt(`Select project to load:\n\n${projects.join('\n')}\n\nEnter project name:`);
+            const projectName = prompt(\`Select project to load:\n\n\${projects.join('\n')}\n\nEnter project name:\`);
             if (projectName && projects.includes(projectName)) {
-                const projectData = JSON.parse(localStorage.getItem(`epitome_business_v2_${projectName}`));
+                const projectData = JSON.parse(localStorage.getItem(\`epitome_project_\${projectName}\`));
                 loadProjectData(projectData);
-                alert(`Project '${projectName}' loaded successfully!`);
+                showStatus(\`Project '\${projectName}' loaded successfully!\`, 'success');
             }
         }
 
         function loadProjectData(data) {
-            // Load basic project info
+            // Load form fields
             document.getElementById('projectName').value = data.name || '';
             document.getElementById('clientName').value = data.client || '';
-            document.getElementById('clientContact').value = data.contact || '';
-            document.getElementById('clientPhone').value = data.phone || '';
-            document.getElementById('usageRights').value = data.usage || '';
+            document.getElementById('projectType').value = data.type || 'commercial';
+            document.getElementById('usageRights').value = data.usage || 'social';
             
             // Load costs
-            if (data.costs) {
-                Object.entries(data.costs).forEach(([key, value]) => {
-                    const input = document.getElementById(key);
-                    if (input) input.value = value;
-                });
+            Object.entries(data.costs || {}).forEach(([key, value]) => {
+                const input = document.getElementById(key);
+                if (input) input.value = value;
+            });
+            
+            // Load margin
+            currentProject.margin = data.margin || 60;
+            document.getElementById('marginSlider').value = currentProject.margin;
+            updateMargin();
+            
+            // Load crew settings
+            if (data.crew) {
+                currentProject.crew = { ...data.crew };
+                populateCrewRoles(); // Re-populate with saved settings
             }
             
-            // Load margin and other settings
-            if (data.margin) {
-                document.getElementById('marginSlider').value = data.margin;
-                document.getElementById('marginDisplay').textContent = data.margin;
-            }
-            
-            document.getElementById('discountPercent').value = data.discountPercent || '0';
-            document.getElementById('loadingPercent').value = data.loadingPercent || '0';
-            
-            // Clear and reload departments
-            if (data.departments) {
-                Object.keys(DEPARTMENTS).forEach(deptKey => {
-                    const tbody = document.getElementById(`${deptKey}-crew`);
-                    tbody.innerHTML = ''; // Clear existing
-                    
-                    if (data.departments[deptKey]) {
-                        data.departments[deptKey].forEach(crewData => {
-                            addCrewToDepartment(deptKey, crewData);
-                        });
-                    }
-                });
-            }
-            
-            // Set mode
-            if (data.mode) {
-                setMode(data.mode);
-            }
-            
-            updateAllDepartmentTotals();
-            calculateTotals();
+            calculateTotal();
         }
 
-        function loadSample() {
-            const sampleData = {
-                name: "Commercial TVC Sample",
-                client: "Premium Agency Pte Ltd",
-                contact: "Creative Director",
-                phone: "+65 9123 4567",
-                usage: "Digital, Social, Broadcast - Singapore, 12 months",
-                mode: "cost-up",
+        function loadDemoProject() {
+            const demoData = {
+                name: "Commercial Demo Project",
+                client: "Sample Client Ltd",
+                type: "commercial",
+                usage: "digital",
                 margin: 60,
                 costs: {
-                    preproduction: 3000,
+                    preproduction: 2000,
+                    production: 25000,
+                    equipment: 8000,
+                    location: 5000,
+                    talents: 12000,
+                    props: 3000,
+                    wardrobes: 2000,
+                    catering: 1500,
+                    transportation: 2500,
+                    postproduction: 18000
+                },
+                crew: {
+                    "Director": true,
+                    "Producer": true,
+                    "Executive Producer": true,
+                    "Director of Photography": false,
+                    "1st Assistant Director": true,
+                    "Video Editor": true,
+                    "Motion Graphics Artist": true,
+                    "Colorist": false,
+                    "Sound Recordist": false,
+                    "Gaffer": false,
+                    "Art Director": false,
+                    "Hair & Makeup Artist": false,
+                    "Wardrobe Stylist": false,
+                    "Casting Director": false,
+                    "Location Manager": true,
+                    "Production Assistant": true
+                }
+            };
+            
+            loadProjectData(demoData);
+            showStatus('Demo project loaded! Modify values to see real-time calculations.', 'success');
+        }
+
+        function showStatus(message, type = 'info') {
+            const statusArea = document.getElementById('status-area');
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-warning';
+            
+            statusArea.innerHTML = \`
+                <div class="alert \${alertClass}">
+                    \${message}
+                </div>
+            \`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusArea.innerHTML = '';
+            }, 5000);
+        }
+
+        // BUSINESS INTELLIGENCE FEATURES
+
+        function detectTier(totalCost) {
+            if (totalCost >= 220000) {
+                return { name: 'Mega TVC', discount: 0, payment: '50/30/20' };
+            } else if (totalCost >= 60000 && totalCost < 220000) {
+                return { name: 'Premium', discount: 0, payment: '50/30/20' };
+            } else if (totalCost >= 40000 && totalCost < 60000) {
+                return { name: 'Mid-Tier', discount: 5, payment: '50/30/20' };
+            } else if (totalCost >= 20000 && totalCost < 40000) {
+                return { name: 'Budget', discount: 10, payment: '50/50' };
+            } else if (totalCost >= 4000 && totalCost < 20000) {
+                return { name: 'Specialist', discount: 0, payment: '50/50' };
+            } else {
+                return { name: 'Custom', discount: 0, payment: '50/50' };
+            }
+        }
+
+        function updateMarginIndicator(marginPercentage) {
+            const indicator = document.getElementById('marginIndicator');
+            if (!indicator) return;
+            
+            let indicatorColor = '#ff6b6b';  // Red
+            let textColor = 'white';
+            
+            if (marginPercentage >= 60) {
+                indicatorColor = '#51cf66';  // Green
+            } else if (marginPercentage >= 50) {
+                indicatorColor = '#ffd43b';  // Yellow
+                textColor = '#333';
+            }
+            
+            indicator.style.backgroundColor = indicatorColor;
+            indicator.style.color = textColor;
+            indicator.innerHTML = `Margin: ${marginPercentage.toFixed(1)}%`;
+        }
+
+        function updateTierDisplay(totalCost) {
+            const tier = detectTier(totalCost);
+            const tierDisplay = document.getElementById('tierDisplay');
+            if (!tierDisplay) return;
+            
+            tierDisplay.innerHTML = `
+                <div class="tier-info">
+                    <strong>Project Tier:</strong> ${tier.name}<br>
+                    <strong>Suggested Payment:</strong> ${tier.payment}<br>
+                    ${tier.discount > 0 ? `<strong>Typical Discount:</strong> ${tier.discount}%` : '<strong>Pricing:</strong> Premium positioning'}
+                </div>
+            `;
+        }
+
+        // Real Project Templates
+        function loadHavaTemplate() {
+            const havaData = {
+                name: "Havas Monopoly Launch",
+                client: "Havas (Premium Tier)",
+                type: "commercial",
+                usage: "digital",
+                margin: 60,
+                costs: {
+                    preproduction: 5000,
                     production: 35000,
-                    overtime: 2000,
                     equipment: 12000,
-                    datamanagement: 800,
                     location: 8000,
-                    props: 5000,
-                    talents: 18000,
+                    talents: 15000,
+                    props: 4000,
                     wardrobes: 3000,
                     catering: 2500,
                     transportation: 4000,
                     postproduction: 25000
-                },
-                discountPercent: 0,
-                loadingPercent: 10,
-                departments: {
-                    production: [
-                        { role: "Director", prep: 2, shoot: 3, wrap: 0, rate: 2500 },
-                        { role: "Executive Producer", prep: 2, shoot: 3, wrap: 1, rate: 1200 },
-                        { role: "Line Producer", prep: 2, shoot: 3, wrap: 1, rate: 800 }
-                    ],
-                    camera: [
-                        { role: "Director of Photography", prep: 1, shoot: 3, wrap: 0, rate: 1500 },
-                        { role: "1st Camera Assistant", prep: 0.5, shoot: 3, wrap: 0, rate: 650 },
-                        { role: "2nd Camera Assistant", prep: 0, shoot: 3, wrap: 0, rate: 400 }
-                    ]
                 }
             };
-            
-            loadProjectData(sampleData);
-            alert('Sample TVC project loaded! Shows a typical $120K commercial with departmental crew breakdown and 10% loading.');
+            loadProjectData(havaData);
+            showStatus('Havas Monopoly template loaded ($75K premium tier)', 'success');
+        }
+
+        function loadOwndaysTemplate() {
+            const owndaysData = {
+                name: "Owndays Myopia Campaign",
+                client: "Owndays (Mid-Tier)",
+                type: "commercial", 
+                usage: "digital",
+                margin: 55,
+                costs: {
+                    preproduction: 3500,
+                    production: 28000,
+                    equipment: 8000,
+                    location: 6000,
+                    talents: 12000,
+                    props: 2500,
+                    wardrobes: 2000,
+                    catering: 1500,
+                    transportation: 3000,
+                    postproduction: 18000
+                }
+            };
+            loadProjectData(owndaysData);
+            showStatus('Owndays template loaded ($54K mid-tier)', 'success');
+        }
+
+        function loadBingXTemplate() {
+            const bingxData = {
+                name: "BingX Collaboration",
+                client: "BingX (Budget Tier)",
+                type: "branded",
+                usage: "social",
+                margin: 50,
+                costs: {
+                    preproduction: 2000,
+                    production: 15000,
+                    equipment: 4000,
+                    location: 3000,
+                    talents: 8000,
+                    props: 1000,
+                    wardrobes: 1000,
+                    catering: 800,
+                    transportation: 1500,
+                    postproduction: 8000
+                }
+            };
+            loadProjectData(bingxData);
+            showStatus('BingX template loaded ($25K budget tier)', 'success');
+        }
+
+        function loadEventTemplate() {
+            const eventData = {
+                name: "Event Coverage",
+                client: "Studio 155 (Specialist)",
+                type: "event",
+                usage: "social",
+                margin: 60,
+                costs: {
+                    preproduction: 500,
+                    production: 2000,
+                    equipment: 800,
+                    location: 0,
+                    talents: 0,
+                    props: 0,
+                    wardrobes: 0,
+                    catering: 200,
+                    transportation: 300,
+                    postproduction: 1200
+                }
+            };
+            loadProjectData(eventData);
+            showStatus('Event template loaded ($4K specialist tier)', 'success');
         }
     </script>
 </body>
